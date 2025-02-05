@@ -1,3 +1,5 @@
+import * as THREE from 'three';
+
 export class Rollover {
     constructor(camera, scene, renderer) {
         this.camera = camera;
@@ -28,7 +30,7 @@ export class Rollover {
 
         const intersects = this.raycaster.intersectObjects(this.scene.children, true);
 
-        if (intersects.length > 0) {
+         if (intersects.length > 0) {
             const firstIntersected = intersects[0].object;
             let nodeMesh = firstIntersected.type === 'Mesh' && firstIntersected.parent.type === 'Node' ? firstIntersected.parent : null;
             let edgeLine = firstIntersected.type === 'Line' && firstIntersected.parent.type === 'Edge' ? firstIntersected.parent : null;
@@ -87,6 +89,15 @@ export class Rollover {
         } else if (object.type === 'Edge') {
             object.resetHighlight();
         }
+    }
+
+    animate() {
+        requestAnimationFrame( this.animate.bind(this) );
+        this.render();
+    }
+
+    render() {
+        // Animation und Rendering-Logik hier, falls benötigt
     }
 
 
