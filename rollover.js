@@ -1,4 +1,3 @@
-import * as THREE from 'three';
 
 export class Rollover {
     constructor(camera, scene, renderer) {
