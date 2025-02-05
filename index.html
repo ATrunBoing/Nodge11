@@ -37,7 +37,14 @@
         <button id="mediumData">Mittleres Netzwerk</button>
         <button id="largeData">Großes Netzwerk</button>
     </div>
-    <script src="https://unpkg.com/three@0.160.0/build/three.js"></script>
-    <script src="main.js"></script>
+    <script type="importmap">
+        {
+            "imports": {
+                "three": "https://unpkg.com/three@0.160.0/build/three.module.js",
+                "three/examples/jsm/": "https://unpkg.com/three@0.160.0/examples/jsm/"
+            }
+        }
+    </script>
+    <script type="module" type="application/javascript" src="main.js"></script>
 </body>
 </html>
