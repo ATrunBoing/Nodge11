@@ -120,8 +120,8 @@ const eventManager = new EventManager();
 const uiManager = new UIManager(stateManager);
 const glowEffect = new GlowEffect();
 const highlightManager = new HighlightManager(stateManager, glowEffect);
-const raycastManager = new RaycastManager(camera, scene);
 import { Rollover } from './rollover.js'; // Importiere Rollover
+const raycastManager = new RaycastManager(camera, scene);
 
 // Initialisiere Rollover
 const rollover = new Rollover(camera, scene, renderer);
