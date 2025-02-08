@@ -56,11 +56,13 @@ export class Node {
     }
 
     applyGlow() {
+        console.log("applyGlow Node");
         this.mesh.material.emissiveIntensity = 0.8; // Stärkere Glow-Intensität
         this.mesh.material.emissive.setHex(0xffa500); // Orange Farbe für den Glow
     }
 
     resetGlow() {
+        console.log("resetGlow Node");
         this.mesh.material.emissiveIntensity = 0; // Kein Glow
         this.mesh.material.emissive.setHex(0x000000); // Keine Emissive Farbe
         this.setColor(this.originalColor); // Zurück zur Originalfarbe

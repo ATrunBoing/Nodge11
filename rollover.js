@@ -15,25 +15,32 @@ export class Rollover {
         this.selectedObject = null; // Für den Glow-Effekt
 
         // Event-Listener
+        // Event-Listener
         this.renderer.domElement.addEventListener('mousemove', this.onMouseMove.bind(this), false);
-        this.renderer.domElement.addEventListener('mouseout', this.onMouseOut.bind(this), false);
+        // this.renderer.domElement.addEventListener('mouseout', this.onMouseOut.bind(this), false);
 
         // Animation starten
         this.animate();
     }
 
     onMouseMove(event) {
+        console.log("onMouseMove called");
         this.mouse.x = (event.clientX / this.renderer.domElement.clientWidth) * 2 - 1;
         this.mouse.y = - (event.clientY / this.renderer.domElement.clientHeight) * 2 + 1;
 
         this.raycaster.setFromCamera(this.mouse, this.camera);
 
-        const intersects = this.raycaster.intersectObjects(this.scene.children, true);
+        // Filter scene children to only include Nodes and Edges
+        const interactiveObjects = this.scene.children.filter(child => child.userData.type === 'node' || child.userData.type === 'edge');
+
+        let intersects = this.raycaster.intersectObjects(interactiveObjects, true);
+
 
          if (intersects.length > 0) {
             const firstIntersected = intersects[0].object;
-            let nodeMesh = firstIntersected.type === 'Mesh' && firstIntersected.parent.type === 'Node' ? firstIntersected.parent : null;
-            let edgeLine = firstIntersected.type === 'Line' && firstIntersected.parent.type === 'Edge' ? firstIntersected.parent : null;
+            // console.log(firstIntersected);
+            let nodeMesh = firstIntersected.userData.type === 'node' ? firstIntersected : null;
+            let edgeLine = firstIntersected.userData.type === 'edge' ? firstIntersected : null;
 
 
             if (nodeMesh) {
@@ -43,6 +50,7 @@ export class Rollover {
                     }
                     this.hoveredObject = nodeMesh;
                     this.applyHighlight(this.hoveredObject);
+                    console.log("Hover Node");
                 }
             } else if (edgeLine) {
                  if (this.hoveredObject !== edgeLine) {
@@ -51,6 +59,7 @@ export class Rollover {
                     }
                     this.hoveredObject = edgeLine;
                     this.applyHighlight(this.hoveredObject);
+                    console.log("Hover Edge");
                 }
             }
              else {
@@ -69,6 +78,7 @@ export class Rollover {
 
 
     onMouseOut() {
+        console.log("mouseOut");
         if (this.hoveredObject) {
             this.resetHighlight(this.hoveredObject);
             this.hoveredObject = null;

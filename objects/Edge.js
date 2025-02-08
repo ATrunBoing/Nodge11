@@ -119,12 +119,14 @@ export class Edge {
     }
 
     applyHighlight() {
+        console.log("applyHighlight Edge");
         this.originalColor = this.options.color; // Sicherstellen, dass wir die Originalfarbe speichern
         this.setColor(0xffa500); // Orange Farbe für Hervorhebung
         this.setWidth(5); // Erhöhe die Linienbreite für Hervorhebung
     }
 
     resetHighlight() {
+        console.log("resetHighlight Edge");
         this.setColor(this.originalColor); // Zurück zur Originalfarbe
         this.setWidth(this.options.width); // Zurück zur ursprünglichen Linienbreite
     }
