@@ -16,18 +16,26 @@ async function loadNetworkData(filename) {
 export const createNodes = async (filename) => {
     const data = await loadNetworkData(filename);
     if (!data) return [];
-    return data.nodes.map(node => new THREE.Vector3(node.x, node.y, node.z));
+    return data.nodes.map(node => {
+        const vector = new THREE.Vector3(node.x, node.y, node.z);
+        vector.name = node.name;
+        return vector;
+    });
 };
 
 // Erstelle Kantendefinitionen aus JSON-Daten
 export const createEdgeDefinitions = async (filename, nodes) => {
     const data = await loadNetworkData(filename);
     if (!data) return [];
-    return data.edges.map(edge => ({
-        start: nodes[edge.start],
-        end: nodes[edge.end],
-        offset: edge.offset
-    }));
+    return data.edges.map(edge => {
+        const edgeDefinition = {
+            start: nodes[edge.start],
+            end: nodes[edge.end],
+            offset: edge.offset,
+            name: edge.name
+        };
+        return edgeDefinition;
+    });
 };
 
 // Exportiere die Dateinamen für einfachen Zugriff

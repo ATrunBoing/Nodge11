@@ -9,6 +9,7 @@ import { UIManager } from './src/core/UIManager.js';
 import { GlowEffect } from './src/effects/GlowEffect.js';
 import { HighlightManager } from './src/effects/HighlightManager.js';
 import { RaycastManager } from './src/utils/RaycastManager.js';
+import { Rollover } from './rollover.js';
 
 // Scene setup
 const scene = new THREE.Scene();
@@ -96,6 +97,7 @@ async function loadNetwork(filename) {
             size: 1.2,
             color: 0xff4500
         });
+        node.mesh.name = pos.name;
         scene.add(node.mesh);
         return node;
     });
@@ -109,6 +111,7 @@ async function loadNetwork(filename) {
             width: 3,
             curveHeight: def.offset + 2
         });
+        edge.line.name = def.name;
         scene.add(edge.line);
         return edge;
     });
@@ -124,7 +127,6 @@ const raycastManager = new RaycastManager(camera, scene);
 
 // Initialisiere Rollover
 const rollover = new Rollover(camera, scene, renderer);
-import { Rollover } from './rollover.js'; // Importiere Rollover
 
 // Initialisiere Event-System
 eventManager.init(camera, scene, renderer);

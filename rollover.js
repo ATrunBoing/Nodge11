@@ -24,7 +24,7 @@ export class Rollover {
     }
 
     onMouseMove(event) {
-        console.log("onMouseMove called");
+        //console.log("onMouseMove called");
         this.mouse.x = (event.clientX / this.renderer.domElement.clientWidth) * 2 - 1;
         this.mouse.y = - (event.clientY / this.renderer.domElement.clientHeight) * 2 + 1;
 
@@ -33,49 +33,66 @@ export class Rollover {
         // Filter scene children to only include Nodes and Edges
         const interactiveObjects = this.scene.children.filter(child => child.userData.type === 'node' || child.userData.type === 'edge');
 
-        let intersects = this.raycaster.intersectObjects(interactiveObjects, true);
+        let intersects = this.raycaster.intersectObjects(interactiveObjects, false);
 
-
-         if (intersects.length > 0) {
-            const firstIntersected = intersects[0].object;
-            // console.log(firstIntersected);
-            let nodeMesh = firstIntersected.userData.type === 'node' ? firstIntersected : null;
-            let edgeLine = firstIntersected.userData.type === 'edge' ? firstIntersected : null;
-
-
-            if (nodeMesh) {
-                if (this.hoveredObject !== nodeMesh) {
-                    if (this.hoveredObject) {
-                        this.resetHighlight(this.hoveredObject);
-                    }
-                    this.hoveredObject = nodeMesh;
-                    this.applyHighlight(this.hoveredObject);
-                    console.log("Hover Node");
-                }
-            } else if (edgeLine) {
-                 if (this.hoveredObject !== edgeLine) {
-                    if (this.hoveredObject) {
-                        this.resetHighlight(this.hoveredObject);
-                    }
-                    this.hoveredObject = edgeLine;
-                    this.applyHighlight(this.hoveredObject);
-                    console.log("Hover Edge");
+        if (intersects.length > 0) {
+            // Filter intersects to only include objects with unique names
+            const uniqueIntersects = [];
+            const names = new Set();
+            for (const intersect of intersects) {
+                const name = intersect.object.name;
+                if (!names.has(name)) {
+                    uniqueIntersects.push(intersect);
+                    names.add(name);
                 }
             }
-             else {
-                if (this.hoveredObject) {
-                    this.resetHighlight(this.hoveredObject);
-                    this.hoveredObject = null;
+
+            console.log("intersectsListe: ", uniqueIntersects.map(i => {
+                const obj = i.object;
+                return {
+                    type: obj.userData.type,
+                    id: obj.id,
+                    name: obj.name
+                };
+            }));
+            /*console.log("intersects.length: ", uniqueIntersects.length);
+            if (uniqueIntersects.length > 20) {
+                console.log(uniqueIntersects);
+            }
+            */
+            const firstIntersected = uniqueIntersects[0].object;
+            const isNode = firstIntersected.userData.type === 'node';
+            const nodeInIntersects = uniqueIntersects.some(intersect => intersect.object.userData.type === 'node');
+
+            if (isNode || nodeInIntersects) {
+                // Node hervorheben
+                let node = isNode ? firstIntersected : intersects.find(intersect => intersect.object.userData.type === 'node').object;
+
+                if (this.hoveredObject !== node) {
+                    if (this.hoveredObject) {
+                        this.resetHighlight(this.hoveredObject);
+                    }
+                    this.hoveredObject = node;
+                    this.applyHighlight(this.hoveredObject);
+                }
+            } else {
+                // Edge hervorheben
+                 if (this.hoveredObject !== firstIntersected) {
+                    if (this.hoveredObject) {
+                        this.resetHighlight(this.hoveredObject);
+                    }
+                    this.hoveredObject = firstIntersected;
+                    this.applyHighlight(this.hoveredObject);
                 }
             }
         } else {
+            // Kein Objekt schneidet den Strahl
             if (this.hoveredObject) {
                 this.resetHighlight(this.hoveredObject);
                 this.hoveredObject = null;
             }
         }
     }
-
 
     onMouseOut() {
         console.log("mouseOut");
@@ -85,18 +102,18 @@ export class Rollover {
         }
     }
 
-    applyHighlight(object) {
-        if (object.type === 'Node') {
+   applyHighlight(object) {
+        if (object.userData.type === 'node' && object.applyGlow) {
             object.applyGlow();
-        } else if (object.type === 'Edge') {
+        } else if (object.userData.type === 'edge' && object.applyHighlight) {
             object.applyHighlight();
         }
     }
 
     resetHighlight(object) {
-        if (object.type === 'Node') {
+        if (object.userData.type === 'node' && object.resetGlow) {
             object.resetGlow();
-        } else if (object.type === 'Edge') {
+        } else if (object.userData.type === 'edge' && object.resetHighlight) {
             object.resetHighlight();
         }
     }
