@@ -14,6 +14,7 @@ export class Node {
         
         this.mesh = this.createMesh();
         this.mesh.userData.type = 'node';        // Für spätere Identifikation
+        this.mesh.glow = null;
     }
 
     createMesh() {
@@ -54,20 +55,6 @@ export class Node {
                 return new THREE.BoxGeometry(size, size, size);
         }
     }
-
-    applyGlow() {
-        console.log("applyGlow Node");
-        this.mesh.material.emissiveIntensity = 0.8; // Stärkere Glow-Intensität
-        this.mesh.material.emissive.setHex(0xffa500); // Orange Farbe für den Glow
-    }
-
-    resetGlow() {
-        console.log("resetGlow Node");
-        this.mesh.material.emissiveIntensity = 0; // Kein Glow
-        this.mesh.material.emissive.setHex(0x000000); // Keine Emissive Farbe
-        this.setColor(this.originalColor); // Zurück zur Originalfarbe
-    }
-
 
     // Hilfsmethode zum Aktualisieren der Farbe
     setColor(color) {

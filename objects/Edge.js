@@ -17,6 +17,8 @@ export class Edge {
 
         this.line = this.createLine();
         this.line.userData.type = 'edge';         // Für spätere Identifikation
+        this.line.userData.edge = this; // Speichere die Edge-Instanz in userData
+        this.line.glow = null;
     }
 
     createLine() {
@@ -120,14 +122,13 @@ export class Edge {
 
     applyHighlight() {
         console.log("applyHighlight Edge");
-        this.originalColor = this.options.color; // Sicherstellen, dass wir die Originalfarbe speichern
-        this.setColor(0xffa500); // Orange Farbe für Hervorhebung
-        this.setWidth(5); // Erhöhe die Linienbreite für Hervorhebung
+        this.line.material.color.setHex(0xffa500); // Orange Farbe für Hervorhebung
+        this.line.material.linewidth = 5; // Erhöhe die Linienbreite für Hervorhebung
     }
 
     resetHighlight() {
         console.log("resetHighlight Edge");
-        this.setColor(this.originalColor); // Zurück zur Originalfarbe
-        this.setWidth(this.options.width); // Zurück zur ursprünglichen Linienbreite
+        this.line.material.color.setHex(this.options.color); // Zurück zur Originalfarbe
+        this.line.material.linewidth = this.options.width; // Zurück zur ursprünglichen Linienbreite
     }
 }

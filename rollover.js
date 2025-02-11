@@ -55,22 +55,21 @@ export class Rollover {
                     name: obj.name
                 };
             }));
-            /*console.log("intersects.length: ", uniqueIntersects.length);
-            if (uniqueIntersects.length > 20) {
-                console.log(uniqueIntersects);
-            }
-            */
+       
             const firstIntersected = uniqueIntersects[0].object;
             const isNode = firstIntersected.userData.type === 'node';
             const nodeInIntersects = uniqueIntersects.some(intersect => intersect.object.userData.type === 'node');
 
             if (isNode || nodeInIntersects) {
                 // Node hervorheben
+                console.log("jetzt node ist!")
                 let node = isNode ? firstIntersected : intersects.find(intersect => intersect.object.userData.type === 'node').object;
 
                 if (this.hoveredObject !== node) {
+                    console.log("Es ist ein anderer gehoverert node");
                     if (this.hoveredObject) {
                         this.resetHighlight(this.hoveredObject);
+                        console.log("gehighlighted ist reset");
                     }
                     this.hoveredObject = node;
                     this.applyHighlight(this.hoveredObject);
@@ -103,23 +102,27 @@ export class Rollover {
     }
 
    applyHighlight(object) {
-        if (object.userData.type === 'node' && object.applyGlow) {
-            object.applyGlow();
-        } else if (object.userData.type === 'edge' && object.applyHighlight) {
-            object.applyHighlight();
+        if (object.userData.type === 'node') {
+            object.material.emissiveIntensity = 0.8; // Stärkere Glow-Intensität
+            object.material.emissive.setHex(0xffa500); // Orange Farbe für den Glow
+        } else if (object.userData.type === 'edge') {
+            const edge = object.userData.edge;
+            edge.applyHighlight();
         }
     }
 
     resetHighlight(object) {
-        if (object.userData.type === 'node' && object.resetGlow) {
-            object.resetGlow();
-        } else if (object.userData.type === 'edge' && object.resetHighlight) {
-            object.resetHighlight();
+        if (object.userData.type === 'node') {
+            object.material.emissiveIntensity = 0; // Kein Glow
+            object.material.emissive.setHex(0x000000); // Keine Emissive Farbe
+        } else if (object.userData.type === 'edge') {
+            const edge = object.userData.edge;
+            edge.resetHighlight();
         }
     }
 
     animate() {
-        requestAnimationFrame( this.animate.bind(this) );
+        requestAnimationFrame(this.animate.bind(this));
         this.render();
     }
 

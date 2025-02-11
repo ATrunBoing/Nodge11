@@ -17,6 +17,7 @@ export class GlowEffect {
     }
 
     applyGlow(object, intensity, options = {}) {
+        console.log("applyGlow mit object: ", object, "intensitiy: ", intensity, "options: ", options);
         if (object.userData.type === 'node') {
             this.applyNodeGlow(object, intensity, options);
         } else if (object.userData.type === 'edge') {
