@@ -42,5 +42,7 @@ export const createEdgeDefinitions = async (filename, nodes) => {
 export const dataFiles = {
     small: 'data/small.json',
     medium: 'data/medium.json',
-    large: 'data/large.json'
+    large: 'data/large.json',
+    mega: 'data/mega.json',
+    mini: 'data/mini.json'
 };

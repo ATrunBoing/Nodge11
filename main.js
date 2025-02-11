@@ -138,6 +138,8 @@ stateManager.animate();
 document.getElementById('smallData').addEventListener('click', () => loadNetwork(dataFiles.small));
 document.getElementById('mediumData').addEventListener('click', () => loadNetwork(dataFiles.medium));
 document.getElementById('largeData').addEventListener('click', () => loadNetwork(dataFiles.large));
+document.getElementById('megaData').addEventListener('click', () => loadNetwork(dataFiles.mega));
+document.getElementById('miniData').addEventListener('click', () => loadNetwork(dataFiles.mini));
 
 // Animation loop
 function animate() {
