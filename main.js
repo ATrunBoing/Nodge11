@@ -136,6 +136,8 @@ stateManager.animate();
 
 // Button Event-Handler
 document.getElementById('smallData').addEventListener('click', () => loadNetwork(dataFiles.small));
+document.getElementById('mediumData').addEventListener('click', () => loadNetwork(dataFiles.medium));
+document.getElementById('largeData').addEventListener('click', () => loadNetwork(dataFiles.large));
 
 // Animation loop
 function animate() {
