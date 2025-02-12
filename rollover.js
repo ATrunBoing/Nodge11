@@ -14,6 +14,9 @@ export class Rollover {
         this.currentOpenObject = null;
         this.selectedObject = null;
 
+		this.hoverAreaSize = 5; // Größe der Hover-Area um das Objekt
+		this.hoverArea = null; // Mesh für die Hover-Area
+
         // Event-Listener
         // Event-Listener
         this.renderer.domElement.addEventListener('mousemove', this.onMouseMove.bind(this), false);
@@ -24,12 +27,20 @@ export class Rollover {
 
         // Event-Listener für das Info-Panel
         document.getElementById('infoPanel').addEventListener('click', this.onInfoPanelClick.bind(this));
+
+		// Erstelle die Hover-Area (als sichtbarer Quader zur Kontrolle)
+		const geometry = new THREE.BoxGeometry( this.hoverAreaSize, this.hoverAreaSize, this.hoverAreaSize );
+		const material = new THREE.MeshBasicMaterial( {color: 0x00ff00, wireframe: true} );
+		this.hoverArea = new THREE.Mesh( geometry, material );
+		this.hoverArea.visible = true; // Sichtbar zur Kontrolle, später auf false setzen
+		this.scene.add( this.hoverArea );
     }
 
-    onInfoPanelClick() {
-        const infoPanel = document.getElementById('infoPanel');
+    onInfoPanelClick(event) {
         const infoPanelContent = document.getElementById('infoPanelContent');
 
+		// KEINE Raycasting-Logik hier, da Klicks auf das Panel den Inhalt nicht schließen sollen
+        
         if (infoPanelContent.style.display === 'none') {
             infoPanelContent.style.display = 'block';
         } else {
@@ -41,16 +52,10 @@ export class Rollover {
         this.raycastManager.updateMousePosition(event);
         const intersectedObject = this.raycastManager.findIntersectedObject();
 
-		if (intersectedObject) {
-			const infoPanel = document.getElementById('infoPanel');
-        	const infoPanelContent = document.getElementById('infoPanelContent');
-
-        	if (infoPanelContent.style.display === 'none') {
-            	infoPanelContent.style.display = 'block';
-        	} else {
-            	infoPanelContent.style.display = 'none';
-        	}
-		}
+        if (intersectedObject) {
+			this.applyHighlight(intersectedObject);
+			this.showInfoPanel(intersectedObject, event);
+        }
     }
 
     onMouseMove(event) {
@@ -65,9 +70,27 @@ export class Rollover {
                 this.hoveredObject = intersectedObject;
                 this.applyHighlight(intersectedObject);
                 this.showInfoPanel(intersectedObject, event);
+
+				// Positioniere die Hover-Area um das Objekt
+				this.hoverArea.position.copy(intersectedObject.position);
             }
         } else {
             if (this.hoveredObject) {
+				// Überprüfe, ob die Maus innerhalb der Hover-Area ist
+				const mouse = new THREE.Vector2();
+				mouse.x = ( event.clientX / window.innerWidth ) * 2 - 1;
+				mouse.y = - ( event.clientY / window.innerHeight ) * 2 + 1;
+
+				const raycaster = new THREE.Raycaster();
+				raycaster.setFromCamera( mouse, this.camera );
+
+				const intersects = raycaster.intersectObject( this.hoverArea );
+
+				if (intersects.length > 0) {
+					// Maus ist noch innerhalb der Hover-Area, also nichts tun
+					return;
+				}
+
                 this.resetHighlight(this.hoveredObject);
                 this.hideInfoPanel();
                 this.hoveredObject = null;
