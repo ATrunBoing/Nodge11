@@ -3,21 +3,11 @@ import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js';
 import { createNodes, createEdgeDefinitions, dataFiles, loadNetworkData } from './data.js';
 import { Node } from './objects/Node.js';
 import { Edge } from './objects/Edge.js';
-import {
-    EventManager
-} from './src/core/EventManager.js';
-import {
-    StateManager
-} from './src/core/StateManager.js';
-import {
-    UIManager
-} from './src/core/UIManager.js';
-import {
-    GlowEffect
-} from './src/effects/GlowEffect.js';
-import {
-    HighlightManager
-} from './src/effects/HighlightManager.js';
+import { EventManager } from './src/core/EventManager.js';
+import { StateManager } from './src/core/StateManager.js';
+import { UIManager } from './src/core/UIManager.js';
+import { GlowEffect } from './src/effects/GlowEffect.js';
+import { HighlightManager } from './src/effects/HighlightManager.js';
 import { RaycastManager } from './src/utils/RaycastManager.js';
 import { Rollover } from './rollover.js';
 
@@ -99,18 +89,22 @@ function clearNetwork() {
 async function loadNetwork(filename) {
     clearNetwork();
 
-    let data;
-    if (filename === 'family.json' || filename === 'julioIglesias.json') {
-        data = await loadNetworkData(filename);
-    } else {
-        data = await loadNetworkData(filename);
-    }
-
     // Lade und erstelle neue Knoten mit verschiedenen Formen
-    let nodePositions = await createNodes(filename);
+    const nodePositions = await createNodes(filename);
+	let data;
+	if (filename === 'family.json' || filename === 'julioIglesias.json') {
+		data = await loadNetworkData(filename);
+	}
     currentNodes = nodePositions.map((pos, index) => {
         let nodeType = 'cube'; // Standardwert
-		
+        if (filename === 'family.json' || filename === 'julioIglesias.json') {
+            const member = data.members[index];
+            if (member.gender === 'female') {
+                nodeType = 'dodecahedron';
+            } else if (member.gender === 'diverse') {
+				nodeType = 'icosahedron';
+			}
+        }
         const node = new Node(pos, {
             type: nodeType,
             size: 1.2,
@@ -122,16 +116,9 @@ async function loadNetwork(filename) {
     });
 
     // Lade und erstelle neue Kanten mit verschiedenen Stilen
-    let edgeDefinitions = await createEdgeDefinitions(filename);
+    const edgeDefinitions = await createEdgeDefinitions(filename, currentNodes);
     currentEdges = edgeDefinitions.map((def, index) => {
-        if (!def) return null;
-        let startNode = currentNodes.find(node => node.mesh.position.x === def.start.x && node.mesh.position.y === def.start.y && node.mesh.position.z === def.start.z);
-		let endNode = currentNodes.find(node => node.mesh.position.x === def.end.x && node.mesh.position.y === def.end.y && node.mesh.position.z === def.end.z);
-		if (!startNode || !endNode) {
-			console.warn("Start oder Endknoten nicht gefunden");
-			return null;
-		}
-        let edge = new Edge(startNode, endNode, {
+        const edge = new Edge(def.start, def.end, {
             style: ['solid', 'dashed', 'dotted'][index % 3],
             color: [0x0000ff, 0x00ff00, 0xff0000][Math.floor(index / 3) % 3],
             width: 3,
@@ -141,7 +128,7 @@ async function loadNetwork(filename) {
         edge.line.name = def.name;
         scene.add(edge.line);
         return edge;
-    }).filter(edge => edge !== null);
+    });
 }
 
 // Initialisiere Manager
