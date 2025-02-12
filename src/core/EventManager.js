@@ -4,18 +4,8 @@ export class EventManager {
     constructor() {
         this.handlers = new Map();
         this.state = {
-            selectedObject: null,
+            selectedObject: null
         };
-        this.raycaster = new THREE.Raycaster();
-        this.mouse = new THREE.Vector2();
-    }
-
-    init(camera, scene, renderer) {
-        this.camera = camera;
-        this.scene = scene;
-        this.renderer = renderer;
-
-        // Event-Listener registrieren
     }
 
     registerHandler(eventType, handler) {
@@ -30,7 +20,8 @@ export class EventManager {
         handlers.forEach(handler => handler(data));
     }
 
-    destroy() {
-        // Event-Listener entfernen
+    init(camera, scene, renderer) {
+        // Hier können Event-Listener hinzugefügt werden, z.B. für Mausbewegungen
+        console.log('EventManager initialisiert');
     }
 }

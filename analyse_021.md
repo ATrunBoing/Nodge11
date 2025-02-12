@@ -1,109 +1,25 @@
-# Analyse der Maus-Interaktionen und Wertveränderungen
+# Analysebericht
 
-## 1. Hover-Events
+## Zusammenfassung
 
-### Wenn Mauszeiger über ein Objekt bewegt wird:
+Die Codebasis dient zur Visualisierung eines Netzwerks von Knoten und Kanten in einer 3D-Szene mit Three.js. Es gibt jedoch Probleme mit der Genauigkeit des Raycastings, insbesondere beim Hovern von Kanten.
 
-#### StateManager Änderungen:
-- `hoveredObject`: → aktuelles Objekt
-- `tooltipVisible`: → true (nur wenn kein Objekt ausgewählt ist)
-- `tooltipContent`: → Basis-Informationen
-- `tooltipPosition`: → aktuelle Mausposition {x, y}
+## Probleme
 
-### Wenn Mauszeiger das Objekt verlässt:
+*   **Ungenaues Raycasting:** Das Hovern von Kanten ist ungenau, besonders wenn sich der Mauszeiger nicht direkt zwischen den Knoten befindet. Das Hovern von Knoten funktioniert bei `mega.json` nicht zuverlässig.
+*   **Falsche Positionierung des Info-Panels:** Das Info-Panel wurde nicht korrekt positioniert.
+*   **Falsche Interaktion mit dem Info-Panel:** Das Info-Panel sollte beim Hovern angezeigt und durch einen Klick ausgefahren werden.
 
-#### StateManager Änderungen:
-- `hoveredObject`: → null
-- `tooltipVisible`: → false (nur wenn kein Objekt ausgewählt ist)
+## Lösungsvorschläge
 
-## 2. Klick-Events
+*   **Raycasting-Parameter anpassen:** Der `threshold`-Wert des Raycasters wurde erhöht, um die Erkennung von Kanten zu verbessern.
+*   **Priorisierung von Nodes entfernen:** Die Priorisierung von Nodes gegenüber Edges in der `findIntersectedObject`-Methode wurde entfernt.
+*   **Schatten für Kanten:** Die `Edge`-Klasse wurde angepasst, um Schatten zu werfen.
+*   **Seitlicher Versatz für Kanten:** Die `Edge`-Klasse wurde angepasst, um einen seitlichen Versatz zu ermöglichen.
+*   **Info-Panel:** Ein Info-Panel wurde implementiert, das beim Hovern über Knoten und Kanten angezeigt wird, beim Klicken weitere Details anzeigt und nun korrekt rechts vom Mauszeiger erscheint.
 
-### Erster Klick auf ein Objekt:
+## Weitere Schritte
 
-#### StateManager Änderungen:
-- `selectedObject`: → geklicktes Objekt
-- `tooltipVisible`: → true
-- `tooltipContent`: → detaillierte Informationen
-- `tooltipPosition`: → Klickposition {x, y}
-
-#### Animations-States:
-- `glowIntensity`: → 0 (Start)
-- `glowDirection`: → 1 (aufwärts)
-- `glowFrequency`: → aus Objektoptionen (Nodes: Standard 4)
-
-### Zweiter Klick auf ausgewähltes Objekt:
-
-#### StateManager Änderungen:
-- `selectedObject`: → null
-- `tooltipVisible`: → false
-- Glow-Effekte werden deaktiviert
-
-## 3. Objekt-spezifische Werte
-
-### Nodes:
-```javascript
-{
-    originalColor: 0xff4500,  // Wird für Reset gespeichert
-    position: Vector3,        // Bleibt unverändert
-    options: {
-        type: 'cube',        // Geometrieform
-        size: 1,             // Grundgröße
-        color: 0xff4500,     // Aktuelle Farbe
-        glowFrequency: 4     // Pulsgeschwindigkeit
-    }
-}
-```
-
-### Edges:
-```javascript
-{
-    options: {
-        color: 0x0000ff,     // Standardfarbe: Blau
-        width: 3,            // Liniendicke
-        style: 'solid',      // solid/dashed/dotted
-        curveHeight: 2,      // Kurvenwölbung
-        segments: 50,        // Kurvensegmente
-        dashSize: 0.5,       // Für gestrichelte Linien
-        gapSize: 0.3        // Für gestrichelte Linien
-    },
-    startNode: Node,         // Verbindungsreferenz
-    endNode: Node           // Verbindungsreferenz
-}
-```
-
-## 4. Spezielle Effekte
-
-### Glow-Animation (bei ausgewählten Objekten):
-- Kontinuierliche Pulsierung zwischen 0 und 1
-- Frequenz durch `glowFrequency` bestimmt
-- Läuft bis zur Objekt-Abwahl
-- Richtungswechsel bei Erreichen der Extremwerte
-
-### Verbundene Objekte:
-- Bei Node-Auswahl: Alle verbundenen Edges und Nodes werden hervorgehoben
-- Speicherung in `activeEffects` (Set) im StateManager
-- Automatische Aktualisierung bei Zustandsänderungen
-
-## 5. Interaktionsfluss
-
-1. **Hover-Start**:
-   - Raycast erkennt Objekt
-   - InteractionManager verarbeitet Event
-   - StateManager aktualisiert Zustand
-   - UI-Updates werden ausgelöst
-
-2. **Hover-Ende**:
-   - Raycast verliert Objekt
-   - Zustand wird zurückgesetzt
-   - UI wird aktualisiert
-
-3. **Klick**:
-   - Objekt wird selektiert/deselektiert
-   - Tooltip wird aktualisiert
-   - Glow-Animation startet/stoppt
-   - Verbundene Objekte werden markiert/demarkiert
-
-4. **Hintergrund-Klick**:
-   - Alle Selektionen werden aufgehoben
-   - UI wird zurückgesetzt
-   - Effekte werden deaktiviert
+*   Testen Sie die Änderungen mit verschiedenen Datensätzen, insbesondere mit `mega.json`, um sicherzustellen, dass das Hovern zuverlässig funktioniert.
+*   Untersuchen Sie alternative Methoden zur Erkennung von Kanten, z. B. durch die Berechnung des Abstands zwischen dem Mauszeiger und der Kante.
+*   Überprüfen Sie die Codebasis auf überflüssigen Code und Verbesserungsmöglichkeiten.

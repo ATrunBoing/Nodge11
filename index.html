@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Nodges 0.43</title>
+    <title>Nodges 0.45</title>
     <link rel="icon" type="image/png" href="favicon-32x32.png">
     <style>
         body { margin: 0; }
@@ -11,6 +11,27 @@
             top: 20px;
             left: 20px;
             z-index: 100;
+        }
+		#infoPanel {
+            position: absolute;
+            top: 10px;
+            left: 10px;
+            background-color: rgba(255, 255, 255, 0.8);
+            padding: 10px;
+            border-radius: 5px;
+            display: none;
+            cursor: pointer;
+            z-index: 100;
+        }
+
+        #infoPanelTitle {
+            margin-top: 0;
+            margin-bottom: 5px;
+        }
+
+        #infoPanelContent {
+            display: none;
+            margin-top: 5px;
         }
         button {
             background-color: #4CAF50;
@@ -47,6 +68,10 @@
             }
         }
     </script>
-    <script type="module" src="main.js"></script>
+    <div id="infoPanel">
+        <h3 id="infoPanelTitle"></h3>
+        <div id="infoPanelContent"></div>
+    </div>
+    <script src="main.js" type="module"></script>
 </body>
 </html>

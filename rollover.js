@@ -1,124 +1,129 @@
 import * as THREE from 'three';
+import { RaycastManager } from './src/utils/RaycastManager.js';
 
 export class Rollover {
     constructor(camera, scene, renderer) {
         this.camera = camera;
         this.scene = scene;
         this.renderer = renderer;
-        this.raycaster = new THREE.Raycaster();
-        this.mouse = new THREE.Vector2();
+        this.raycastManager = new RaycastManager(camera, scene);
         this.hoveredObject = null;
         this.glowIntensity = 0;
         this.glowDirection = 1;
         this.lastTime = performance.now();
-        this.currentOpenObject = null; // Track the currently open object
-        this.selectedObject = null; // Für den Glow-Effekt
+        this.currentOpenObject = null;
+        this.selectedObject = null;
 
         // Event-Listener
         // Event-Listener
         this.renderer.domElement.addEventListener('mousemove', this.onMouseMove.bind(this), false);
-        // this.renderer.domElement.addEventListener('mouseout', this.onMouseOut.bind(this), false);
+		this.renderer.domElement.addEventListener('click', this.onSceneClick.bind(this), false);
 
         // Animation starten
         this.animate();
+
+        // Event-Listener für das Info-Panel
+        document.getElementById('infoPanel').addEventListener('click', this.onInfoPanelClick.bind(this));
+    }
+
+    onInfoPanelClick() {
+        const infoPanel = document.getElementById('infoPanel');
+        const infoPanelContent = document.getElementById('infoPanelContent');
+
+        if (infoPanelContent.style.display === 'none') {
+            infoPanelContent.style.display = 'block';
+        } else {
+            infoPanelContent.style.display = 'none';
+        }
+    }
+
+	onSceneClick(event) {
+        this.raycastManager.updateMousePosition(event);
+        const intersectedObject = this.raycastManager.findIntersectedObject();
+
+		if (intersectedObject) {
+			const infoPanel = document.getElementById('infoPanel');
+        	const infoPanelContent = document.getElementById('infoPanelContent');
+
+        	if (infoPanelContent.style.display === 'none') {
+            	infoPanelContent.style.display = 'block';
+        	} else {
+            	infoPanelContent.style.display = 'none';
+        	}
+		}
     }
 
     onMouseMove(event) {
-        //console.log("onMouseMove called");
-        this.mouse.x = (event.clientX / this.renderer.domElement.clientWidth) * 2 - 1;
-        this.mouse.y = - (event.clientY / this.renderer.domElement.clientHeight) * 2 + 1;
+        this.raycastManager.updateMousePosition(event);
+        const intersectedObject = this.raycastManager.findIntersectedObject();
 
-        this.raycaster.setFromCamera(this.mouse, this.camera);
-
-        // Filter scene children to only include Nodes and Edges
-        const interactiveObjects = this.scene.children.filter(child => child.userData.type === 'node' || child.userData.type === 'edge');
-
-        let intersects = this.raycaster.intersectObjects(interactiveObjects, false);
-
-        if (intersects.length > 0) {
-            // Filter intersects to only include objects with unique names
-            const uniqueIntersects = [];
-            const names = new Set();
-            for (const intersect of intersects) {
-                const name = intersect.object.name;
-                if (!names.has(name)) {
-                    uniqueIntersects.push(intersect);
-                    names.add(name);
+        if (intersectedObject) {
+            if (this.hoveredObject !== intersectedObject) {
+                if (this.hoveredObject) {
+                    this.resetHighlight(this.hoveredObject);
                 }
-            }
-
-            console.log("intersectsListe: ", uniqueIntersects.map(i => {
-                const obj = i.object;
-                return {
-                    type: obj.userData.type,
-                    id: obj.id,
-                    name: obj.name
-                };
-            }));
-       
-            const firstIntersected = uniqueIntersects[0].object;
-            const isNode = firstIntersected.userData.type === 'node';
-            const nodeInIntersects = uniqueIntersects.some(intersect => intersect.object.userData.type === 'node');
-
-            if (isNode || nodeInIntersects) {
-                // Node hervorheben
-                console.log("jetzt node ist!")
-                let node = isNode ? firstIntersected : intersects.find(intersect => intersect.object.userData.type === 'node').object;
-
-                if (this.hoveredObject !== node) {
-                    console.log("Es ist ein anderer gehoverert node");
-                    if (this.hoveredObject) {
-                        this.resetHighlight(this.hoveredObject);
-                        console.log("gehighlighted ist reset");
-                    }
-                    this.hoveredObject = node;
-                    this.applyHighlight(this.hoveredObject);
-                }
-            } else {
-                // Edge hervorheben
-                 if (this.hoveredObject !== firstIntersected) {
-                    if (this.hoveredObject) {
-                        this.resetHighlight(this.hoveredObject);
-                    }
-                    this.hoveredObject = firstIntersected;
-                    this.applyHighlight(this.hoveredObject);
-                }
+                this.hoveredObject = intersectedObject;
+                this.applyHighlight(intersectedObject);
+                this.showInfoPanel(intersectedObject, event);
             }
         } else {
-            // Kein Objekt schneidet den Strahl
             if (this.hoveredObject) {
                 this.resetHighlight(this.hoveredObject);
+                this.hideInfoPanel();
                 this.hoveredObject = null;
             }
         }
     }
 
-    onMouseOut() {
-        console.log("mouseOut");
-        if (this.hoveredObject) {
-            this.resetHighlight(this.hoveredObject);
-            this.hoveredObject = null;
-        }
-    }
-
    applyHighlight(object) {
         if (object.userData.type === 'node') {
-            object.material.emissiveIntensity = 0.8; // Stärkere Glow-Intensität
-            object.material.emissive.setHex(0xffa500); // Orange Farbe für den Glow
+            object.material.emissiveIntensity = 0.8;
+            object.material.emissive.setHex(0xffa500);
         } else if (object.userData.type === 'edge') {
             const edge = object.userData.edge;
-            edge.applyHighlight();
+            edge.line.material.color.setHex(0xffa500);
+            edge.line.material.linewidth = 3;
         }
     }
 
     resetHighlight(object) {
         if (object.userData.type === 'node') {
-            object.material.emissiveIntensity = 0; // Kein Glow
-            object.material.emissive.setHex(0x000000); // Keine Emissive Farbe
+            object.material.emissiveIntensity = 0;
+            object.material.emissive.setHex(0x000000);
         } else if (object.userData.type === 'edge') {
             const edge = object.userData.edge;
-            edge.resetHighlight();
+            edge.line.material.color.setHex(edge.options.color);
+            edge.line.material.linewidth = 3;
         }
+    }
+
+    showInfoPanel(object, event) {
+        const infoPanel = document.getElementById('infoPanel');
+        const infoPanelTitle = document.getElementById('infoPanelTitle');
+        const infoPanelContent = document.getElementById('infoPanelContent');
+
+        if (object.userData.type === 'node') {
+            infoPanelTitle.textContent = object.name;
+            infoPanelContent.innerHTML = `
+                <strong>Type:</strong> ${object.geometry.type}<br>
+                <strong>Position:</strong> ${object.position.x}, ${object.position.y}, ${object.position.z}
+            `;
+        } else if (object.userData.type === 'edge') {
+            infoPanelTitle.textContent = object.name;
+            infoPanelContent.innerHTML = `
+                <strong>Start:</strong> ${object.userData.edge.startNode.mesh.name}<br>
+                <strong>End:</strong> ${object.userData.edge.endNode.mesh.name}
+            `;
+        }
+
+        infoPanel.style.left = (event.clientX) + 20 + 'px';
+        infoPanel.style.top = (event.clientY) + 20 + 'px';
+        infoPanel.style.display = 'block';
+    }
+
+    hideInfoPanel() {
+        const infoPanel = document.getElementById('infoPanel');
+        infoPanel.style.display = 'none';
     }
 
     animate() {

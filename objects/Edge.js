@@ -1,23 +1,23 @@
-import * as THREE from 'three';
+  import * as THREE from 'three';
 
 export class Edge {
     constructor(startNode, endNode, options = {}) {
         this.startNode = startNode;
         this.endNode = endNode;
         this.options = {
-            color: options.color || 0x0000ff,     // Standardfarbe: Blau
-            width: options.width || 3,            // Liniendicke
-            style: options.style || 'solid',      // solid, dashed, dotted
-            curveHeight: options.curveHeight || 2,// Höhe der Kurvenwölbung
-            segments: options.segments || 50,     // Anzahl der Segmente für die Kurve
-            dashSize: options.dashSize || 0.5,    // Größe der Striche bei gestrichelten Linien
-            gapSize: options.gapSize || 0.3,     // Größe der Lücken bei gestrichelten Linien
+            color: options.color || 0x0000ff,
+            style: options.style || 'solid',
+            curveHeight: options.curveHeight || 2,
+			offset: options.offset || 0,
+            segments: options.segments || 50,
+            dashSize: options.dashSize || 0.5,
+            gapSize: 0.3,
             ...options
         };
 
         this.line = this.createLine();
-        this.line.userData.type = 'edge';         // Für spätere Identifikation
-        this.line.userData.edge = this; // Speichere die Edge-Instanz in userData
+        this.line.userData.type = 'edge';
+        this.line.userData.edge = this;
         this.line.glow = null;
     }
 
@@ -26,27 +26,40 @@ export class Edge {
         const geometry = this.createGeometry(curve);
         const material = this.createMaterial();
         
-        const line = new THREE.Line(geometry, material);
+        const line = new THREE.Mesh(geometry, material);
+        line.castShadow = true;
+        line.receiveShadow = true;
         return line;
     }
 
     createCurve() {
+        const start = this.startNode.mesh.position.clone();
+        const end = this.endNode.mesh.position.clone();
+    
         const midPoint = new THREE.Vector3(
-            (this.startNode.mesh.position.x + this.endNode.mesh.position.x) / 2,
-            (this.startNode.mesh.position.y + this.endNode.mesh.position.y) / 2 + this.options.curveHeight,
-            (this.startNode.mesh.position.z + this.endNode.mesh.position.z) / 2
+            (start.x + end.x) / 2,
+            (start.y + end.y) / 2 + this.options.curveHeight,
+            (start.z + end.z) / 2
         );
-
+    
+        // Seitlichen Versatz hinzufügen
+        if (this.options.offset !== 0) {
+            const direction = new THREE.Vector3().subVectors(end, start).normalize();
+            const offsetDirection = new THREE.Vector3(-direction.z, 0, direction.x).normalize(); // Senkrechte Richtung
+            midPoint.addScaledVector(offsetDirection, this.options.offset);
+        }
+    
         return new THREE.QuadraticBezierCurve3(
-            this.startNode.mesh.position,
+            start,
             midPoint,
-            this.endNode.mesh.position
+            end
         );
     }
 
     createGeometry(curve) {
         const points = curve.getPoints(this.options.segments);
-        return new THREE.BufferGeometry().setFromPoints(points);
+        const geometry = new THREE.TubeGeometry(curve, this.options.segments, 0.1, 3, false);
+        return geometry;
     }
 
     createMaterial() {
@@ -54,81 +67,44 @@ export class Edge {
 
         switch(this.options.style) {
             case 'dashed':
-                material = new THREE.LineDashedMaterial({
+                material = new THREE.MeshPhongMaterial({
                     color: this.options.color,
-                    linewidth: this.options.width,
-                    dashSize: this.options.dashSize,
-                    gapSize: this.options.gapSize
+                    transparent: true,
+                    opacity: 0.5,
+					side: THREE.DoubleSide,
+					shininess: 30
                 });
                 break;
-
             case 'dotted':
-                material = new THREE.LineDashedMaterial({
+                material = new THREE.MeshPhongMaterial({
                     color: this.options.color,
-                    linewidth: this.options.width,
-                    dashSize: 0.1,
-                    gapSize: 0.1
+                    transparent: true,
+                    opacity: 0.5,
+					side: THREE.DoubleSide,
+					shininess: 30
                 });
                 break;
-
-            case 'solid':
             default:
-                material = new THREE.LineBasicMaterial({
+                material = new THREE.MeshPhongMaterial({
                     color: this.options.color,
-                    linewidth: this.options.width
+					side: THREE.DoubleSide,
+					shininess: 30
                 });
                 break;
         }
-
-        return material;
+		return material;
     }
 
-    // Hilfsmethode zum Aktualisieren der Farbe
     setColor(color) {
         this.options.color = color;
-        this.line.material.color.setHex(color);
     }
 
-    // Hilfsmethode zum Aktualisieren der Liniendicke
-    setWidth(width) {
-        this.options.width = width;
-        this.line.material.linewidth = width;
-    }
-
-    // Hilfsmethode zum Ändern des Linienstils
     setStyle(style) {
         this.options.style = style;
-        const oldMaterial = this.line.material;
-        this.line.material = this.createMaterial();
-        oldMaterial.dispose();
-        
-        if (style !== 'solid') {
-            this.line.computeLineDistances();
-        }
-    }
-
-    // Hilfsmethode zum Aktualisieren der Kurvenform
-    updateCurve(curveHeight) {
-        this.options.curveHeight = curveHeight;
-        const curve = this.createCurve();
-        const newGeometry = this.createGeometry(curve);
-        this.line.geometry.dispose();
-        this.line.geometry = newGeometry;
-        
-        if (this.options.style !== 'solid') {
-            this.line.computeLineDistances();
-        }
-    }
-
-    applyHighlight() {
-        console.log("applyHighlight Edge");
-        this.line.material.color.setHex(0xffa500); // Orange Farbe für Hervorhebung
-        this.line.material.linewidth = 5; // Erhöhe die Linienbreite für Hervorhebung
     }
 
     resetHighlight() {
-        console.log("resetHighlight Edge");
-        this.line.material.color.setHex(this.options.color); // Zurück zur Originalfarbe
-        this.line.material.linewidth = this.options.width; // Zurück zur ursprünglichen Linienbreite
+        this.line.material.color.setHex(this.options.color);
+        this.line.transparent = (this.options.style === 'dashed' || this.options.style === 'dotted');
     }
 }

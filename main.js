@@ -109,7 +109,8 @@ async function loadNetwork(filename) {
             style: ['solid', 'dashed', 'dotted'][index % 3],
             color: [0x0000ff, 0x00ff00, 0xff0000][Math.floor(index / 3) % 3],
             width: 3,
-            curveHeight: def.offset + 2
+            curveHeight: def.offset + 2,
+			offset: (index % 5) - 2 // Beispiel für einen zufälligen seitlichen Versatz
         });
         edge.line.name = def.name;
         scene.add(edge.line);
