@@ -1,0 +1,83 @@
+{
+  "metadata": {
+    "type": "family",
+    "description": "Familienstammbaum von Julio Iglesias"
+  },
+  "familyName": "Iglesias",
+  "members": [
+    {
+      "id": 1,
+      "name": "Julio Iglesias Sr.",
+      "generation": 1,
+      "gender": "male",
+      "position": { "x": 0, "y": 0, "z": 0 },
+      "spouse": 2,
+      "children": [3]
+    },
+    {
+      "id": 2,
+      "name": "Rosario de la Cueva y Perignat",
+      "generation": 1,
+      "gender": "female",
+      "position": { "x": 0, "y": 0, "z": 9 },
+      "spouse": 1,
+      "children": [3]
+    },
+    {
+      "id": 3,
+      "name": "Julio Iglesias",
+      "generation": 2,
+      "gender": "male",
+      "position": { "x": 0, "y": 9, "z": 0 },
+      "spouse": 4,
+      "children": [5, 6, 7]
+    },
+    {
+      "id": 4,
+      "name": "Isabel Preysler",
+      "generation": 2,
+      "gender": "female",
+      "position": { "x": 0, "y": 9, "z": 9 },
+      "spouse": 3,
+      "children": [5, 6, 7]
+    },
+    {
+      "id": 5,
+      "name": "María Isabel Iglesias Preysler",
+      "generation": 3,
+      "gender": "female",
+      "position": { "x": 0, "y": 18, "z": 0 },
+      "parents": [3, 4]
+    },
+    {
+      "id": 6,
+      "name": "Julio José Iglesias Preysler",
+      "generation": 3,
+      "gender": "male",
+      "position": { "x": 9, "y": 18, "z": 0 },
+      "parents": [3, 4]
+    },
+    {
+      "id": 7,
+      "name": "Enrique Iglesias",
+      "generation": 3,
+      "gender": "male",
+      "position": { "x": 18, "y": 18, "z": 0 },
+      "parents": [3, 4]
+    }
+  ],
+  "edges": [
+    { "start": 1, "end": 2, "type": "spouse", "offset": 1 },
+    { "start": 2, "end": 1, "type": "spouse", "offset": 2 },
+    { "start": 1, "end": 3, "type": "parent", "offset": 3 },
+    { "start": 2, "end": 3, "type": "parent", "offset": 4 },
+    { "start": 3, "end": 4, "type": "spouse", "offset": 5 },
+    { "start": 4, "end": 3, "type": "spouse", "offset": 6 },
+    { "start": 3, "end": 5, "type": "parent", "offset": 7 },
+    { "start": 3, "end": 6, "type": "parent", "offset": 8 },
+    { "start": 3, "end": 7, "type": "parent", "offset": 9 },
+    { "start": 4, "end": 5, "type": "parent", "offset": 10 },
+    { "start": 4, "end": 6, "type": "parent", "offset": 11 },
+    { "start": 4, "end": 7, "type": "parent", "offset": 12 }
+  ]
+}

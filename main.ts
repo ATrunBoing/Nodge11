@@ -4,9 +4,9 @@ import { createNodes, createEdgeDefinitions, dataFiles, loadNetworkData } from '
 import { Node } from './objects/Node.js';
 import { Edge } from './objects/Edge.js';
 import { EventManager from './src/core/EventManager.js';
-import { StateManager from './src/core/StateManager.js';
+import { StateManager } from './src/core/StateManager.js';
 import { UIManager } from './src/core/UIManager.js';
-import { GlowEffect from './src/effects/GlowEffect.js';
+import { GlowEffect } from './src/effects/GlowEffect.js';
 import { HighlightManager } from './src/effects/HighlightManager.js';
 import { RaycastManager } from './src/utils/RaycastManager.js';
 import { Rollover } from './rollover.js';

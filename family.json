@@ -5,121 +5,191 @@
       "id": 1,
       "name": "Karl Mustermann",
       "generation": 1,
-      "position": { "x": 0, "y": 0, "z": 0 }
+      "gender": "male",
+      "position": { "x": 0, "y": 0, "z": 0 },
+      "spouse": 2,
+      "children": [3, 4]
     },
     {
       "id": 2,
-      "name": "Erika Mustermann",
+      "name": "Erika Mustermann-Schmidt",
       "generation": 1,
-      "position": { "x": 1, "y": 0, "z": 1 }
+      "gender": "female",
+      "position": { "x": 3, "y": 0, "z": 3 },
+      "spouse": 1,
+      "children": [3, 4]
     },
     {
       "id": 3,
       "name": "Hans Mustermann",
       "generation": 2,
-      "position": { "x": 0, "y": 1, "z": 0 }
+      "gender": "male",
+      "position": { "x": 0, "y": 3, "z": 0 },
+      "parents": [1, 2],
+      "spouse": 5,
+      "children": [7, 8]
     },
     {
       "id": 4,
-      "name": "Maria Mustermann",
+      "name": "Maria Mustermann-Meyer",
       "generation": 2,
-      "position": { "x": 1, "y": 1, "z": 1 }
+      "gender": "female",
+      "position": { "x": 3, "y": 3, "z": 3 },
+      "parents": [1, 2],
+      "children": [9, 10, 11]
     },
     {
       "id": 5,
-      "name": "Peter Mustermann",
+      "name": "Peter Müller",
       "generation": 2,
-      "position": { "x": 2, "y": 1, "z": 0 }
+      "gender": "male",
+      "position": { "x": 6, "y": 3, "z": 0 },
+      "spouse": 3,
+      "children": [7, 8]
     },
     {
       "id": 6,
       "name": "Julia Mustermann",
       "generation": 2,
-      "position": { "x": 3, "y": 1, "z": 1 }
+      "gender": "female",
+      "position": { "x": 9, "y": 3, "z": 3 },
+      "parents": [null, null],
+      "children": [12, 13]
     },
     {
       "id": 7,
-      "name": "Sophie Mustermann",
+      "name": "Sophie Mustermann-Müller",
       "generation": 3,
-      "position": { "x": 0, "y": 2, "z": 0 }
+      "gender": "female",
+      "position": { "x": 0, "y": 6, "z": 0 },
+      "parents": [3, 5]
     },
     {
       "id": 8,
-      "name": "David Mustermann",
+      "name": "David Mustermann-Müller",
       "generation": 3,
-      "position": { "x": 1, "y": 2, "z": 0 }
+      "gender": "male",
+      "position": { "x": 3, "y": 6, "z": 0 },
+      "parents": [3, 5]
     },
     {
       "id": 9,
       "name": "Anna Mustermann",
       "generation": 3,
-      "position": { "x": 2, "y": 2, "z": 0 }
+      "gender": "female",
+      "position": { "x": 6, "y": 6, "z": 0 },
+      "parents": [4, null]
     },
     {
       "id": 10,
       "name": "Michael Mustermann",
       "generation": 3,
-      "position": { "x": 3, "y": 2, "z": 0 }
+      "gender": "male",
+      "position": { "x": 9, "y": 6, "z": 0 },
+      "parents": [4, null]
     },
     {
       "id": 11,
       "name": "Lisa Mustermann",
       "generation": 3,
-      "position": { "x": 4, "y": 2, "z": 0 }
+      "gender": "female",
+      "position": { "x": 12, "y": 6, "z": 0 },
+      "parents": [4, null]
     },
     {
       "id": 12,
       "name": "Thomas Mustermann",
       "generation": 3,
-      "position": { "x": 5, "y": 2, "z": 0 }
+      "gender": "male",
+      "position": { "x": 15, "y": 6, "z": 0 },
+      "parents": [6, null]
     },
     {
       "id": 13,
       "name": "Laura Mustermann",
       "generation": 3,
-      "position": { "x": 6, "y": 2, "z": 0 }
+      "gender": "female",
+      "position": { "x": 18, "y": 6, "z": 0 },
+      "parents": [6, null]
     },
     {
       "id": 14,
-      "name": "Simon Mustermann",
+      "name": "Simon Schmidt",
       "generation": 3,
-      "position": { "x": 0, "y": 3, "z": 0 }
+      "gender": "diverse",
+      "position": { "x": 0, "y": 9, "z": 0 },
+      "parents": [null, null]
     },
     {
       "id": 15,
-      "name": "Lena Mustermann",
+      "name": "Lena Fischer",
       "generation": 3,
-      "position": { "x": 1, "y": 3, "z": 0 }
+      "gender": "female",
+      "position": { "x": 3, "y": 9, "z": 0 },
+      "parents": [null, null],
+      "spouse": 16
     },
     {
       "id": 16,
-      "name": "Max Mustermann",
+      "name": "Max Fischer",
       "generation": 3,
-      "position": { "x": 2, "y": 3, "z": 0 }
+      "gender": "male",
+      "position": { "x": 6, "y": 9, "z": 0 },
+      "parents": [null, null],
+      "spouse": 15
     },
     {
       "id": 17,
-      "name": "Mia Mustermann",
+      "name": "Mia Sommer",
       "generation": 3,
-      "position": { "x": 3, "y": 3, "z": 0 }
+      "gender": "female",
+      "position": { "x": 9, "y": 9, "z": 0 },
+      "parents": [null, null]
     },
     {
       "id": 18,
-      "name": "Felix Mustermann",
+      "name": "Felix Winter",
       "generation": 3,
-      "position": { "x": 4, "y": 3, "z": 0 }
+      "gender": "male",
+      "position": { "x": 12, "y": 9, "z": 0 },
+      "parents": [null, null]
     },
     {
       "id": 19,
-      "name": "Clara Mustermann",
+      "name": "Clara Herbst",
       "generation": 3,
-      "position": { "x": 5, "y": 3, "z": 0 }
+      "gender": "female",
+      "position": { "x": 15, "y": 9, "z": 0 },
+      "parents": [null, null]
     },
     {
       "id": 20,
-      "name": "Paul Mustermann",
+      "name": "Paul Frühling",
       "generation": 3,
-      "position": { "x": 6, "y": 3, "z": 0 }
+      "gender": "male",
+      "position": { "x": 18, "y": 9, "z": 0 },
+      "parents": [null, null]
     }
+  ],
+  "edges": [
+    { "start": 1, "end": 2, "type": "spouse" },
+    { "start": 2, "end": 1, "type": "spouse" },
+    { "start": 1, "end": 3, "type": "parent" },
+    { "start": 1, "end": 4, "type": "parent" },
+    { "start": 2, "end": 3, "type": "parent" },
+    { "start": 2, "end": 4, "type": "parent" },
+    { "start": 3, "end": 5, "type": "spouse" },
+    { "start": 5, "end": 3, "type": "spouse" },
+    { "start": 3, "end": 7, "type": "parent" },
+    { "start": 3, "end": 8, "type": "parent" },
+    { "start": 5, "end": 7, "type": "parent" },
+    { "start": 5, "end": 8, "type": "parent" },
+    { "start": 4, "end": 9, "type": "parent" },
+    { "start": 4, "end": 10, "type": "parent" },
+    { "start": 4, "end": 11, "type": "parent" },
+    { "start": 6, "end": 12, "type": "parent" },
+    { "start": 6, "end": 13, "type": "parent" },
+    { "start": 15, "end": 16, "type": "spouse" },
+    { "start": 16, "end": 15, "type": "spouse" }
   ]
 }

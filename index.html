@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Nodges 0.45</title>
+    <title>Nodges 0.46</title>
     <link rel="icon" type="image/png" href="favicon-32x32.png">
     <style>
         body { margin: 0; }
@@ -11,6 +11,8 @@
             top: 20px;
             left: 20px;
             z-index: 100;
+			display: flex;
+			flex-direction: column;
         }
 		#infoPanel {
             position: absolute;
@@ -37,12 +39,12 @@
             background-color: #4CAF50;
             border: none;
             color: white;
-            padding: 10px 20px;
+            padding: 5px 10px;
             text-align: center;
             text-decoration: none;
             display: inline-block;
-            font-size: 16px;
-            margin: 4px 2px;
+            font-size: 12px;
+            margin: 2px;
             cursor: pointer;
             border-radius: 4px;
             transition: background-color 0.3s;
@@ -50,6 +52,7 @@
         button:hover {
             background-color: #45a049;
         }
+		
     </style>
 </head>
 <body>
@@ -58,8 +61,12 @@
         <button id="smallData">Kleines Netzwerk</button>
         <button id="mediumData">Mittleres Netzwerk</button>
         <button id="largeData">Großes Netzwerk</button>
-        <button id="megaData">Mega Netzwerk</button>
-    </div>
+		<button id="megaData">Mega Netzwerk</button>
+		<button id="megaData">Mega Netzwerk</button>
+		<button id="familyData">Familien Daten</button>
+		<button id="julioIglesias">Julio Iglesias</button>
+   </div>
+   <div id="familyData"></div>
     <script type="importmap">
         {
             "imports": {
