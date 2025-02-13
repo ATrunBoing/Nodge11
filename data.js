@@ -22,37 +22,41 @@ export const createNodes = async (filename) => {
     let nodes = [];
     if (data.members) {
         nodes = data.members;
-    } else if (Array.isArray(data)) {
-        nodes = data;
+    } else if (data.nodes) {
+        nodes = data.nodes;
+    } else {
+        console.warn('Invalid data format: nodes array is missing.');
+        return [];
     }
 
-    allNodes = nodes.map(member => { // Speichere die Knoten in allNodes
-        const vector = new THREE.Vector3(member.position.x, member.position.y, member.position.z);
-        vector.name = member.name;
+    allNodes = nodes.map(node => { // Speichere die Knoten in allNodes
+        let x, y, z;
+        if (node.position) {
+            x = node.position.x;
+            y = node.position.y;
+            z = node.position.z;
+        } else {
+            x = node.x;
+            y = node.y;
+            z = node.z;
+        }
+        const vector = new THREE.Vector3(x, y, z);
+        vector.name = node.name || '';
         return vector;
     });
     return allNodes;
 };
 
 // Erstelle Kantendefinitionen aus JSON-Daten
-export const createEdgeDefinitions = async (filename) => {
+export const createEdgeDefinitions = async (filename, nodes) => {
     const data = await loadNetworkData(filename);
     if (!data) return [];
     return data.edges.map(edge => {
-		let start;
-		let end;
-		if (filename === 'family.json' || filename === 'julioIglesias.json') {
-			start = allNodes.find(node => node.position.x === data.members[edge.start - 1].position.x && node.position.y === data.members[edge.start - 1].position.y && node.position.z === data.members[edge.start - 1].position.z);
-			end = allNodes.find(node =>  node.position.x === data.members[edge.end - 1].position.x && node.position.y === data.members[edge.end - 1].position.y && node.position.z === data.members[edge.end - 1].position.z);
-		} else {
-			start = allNodes.find(node => node.position.x === data.nodes[edge.start - 1].x && node.position.y === data.nodes[edge.start - 1].y && node.position.z === data.nodes[edge.start - 1].z);
-			end = allNodes.find(node => node.position.x === data.nodes[edge.end - 1].x && node.position.y === data.nodes[edge.end - 1].y && node.position.z === data.nodes[edge.end - 1].z);
-		}
-        const startIndex = edge.start - 1;
-        const endIndex = edge.end - 1;
+		let start = nodes[edge.start];
+		let end = nodes[edge.end];
 
         if (!start || !end) {
-            console.warn(`Ungültiger Knotenindex in Kantendefinition: start=${edge.start}, end=${edge.end}, Knotenanzahl=${allNodes.length}`);
+            console.warn(`Ungültiger Knotenindex in Kantendefinition: start=${edge.start}, end=${edge.end}, Knotenanzahl=${nodes.length}`);
             return null; // Überspringe diese Kante
         }
 

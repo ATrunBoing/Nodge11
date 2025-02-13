@@ -91,22 +91,9 @@ async function loadNetwork(filename) {
 
     // Lade und erstelle neue Knoten mit verschiedenen Formen
     const nodePositions = await createNodes(filename);
-	let data;
-	if (filename === 'family.json' || filename === 'julioIglesias.json') {
-		data = await loadNetworkData(filename);
-	}
-    currentNodes = nodePositions.map((pos, index) => {
-        let nodeType = 'cube'; // Standardwert
-        if (filename === 'family.json' || filename === 'julioIglesias.json') {
-            const member = data.members[index];
-            if (member.gender === 'female') {
-                nodeType = 'dodecahedron';
-            } else if (member.gender === 'diverse') {
-				nodeType = 'icosahedron';
-			}
-        }
+    currentNodes = nodePositions.map(pos => {
         const node = new Node(pos, {
-            type: nodeType,
+            type: 'cube',
             size: 1.2,
             color: 0xff4500
         });
@@ -117,18 +104,20 @@ async function loadNetwork(filename) {
 
     // Lade und erstelle neue Kanten mit verschiedenen Stilen
     const edgeDefinitions = await createEdgeDefinitions(filename, currentNodes);
-    currentEdges = edgeDefinitions.map((def, index) => {
-        const edge = new Edge(def.start, def.end, {
-            style: ['solid', 'dashed', 'dotted'][index % 3],
-            color: [0x0000ff, 0x00ff00, 0xff0000][Math.floor(index / 3) % 3],
-            width: 3,
-            curveHeight: def.offset + 2,
-            offset: def.offset,
+    if (edgeDefinitions) {
+        currentEdges = edgeDefinitions.map((def) => {
+            const edge = new Edge(def.start, def.end, {
+                style: ['solid', 'dashed', 'dotted'][Math.floor(Math.random() * 3)],
+                color: [0x0000ff, 0x00ff00, 0xff0000][Math.floor(Math.random() * 3)],
+                width: 3,
+                curveHeight: def.offset + 2,
+                offset: def.offset,
+            });
+            edge.line.name = def.name;
+            scene.add(edge.line);
+            return edge;
         });
-        edge.line.name = def.name;
-        scene.add(edge.line);
-        return edge;
-    });
+    }
 }
 
 // Initialisiere Manager
@@ -155,7 +144,6 @@ document.getElementById('largeData').addEventListener('click', () => loadNetwork
 document.getElementById('megaData').addEventListener('click', () => loadNetwork(dataFiles.mega));
 document.getElementById('miniData').addEventListener('click', () => loadNetwork(dataFiles.mini));
 document.getElementById('familyData').addEventListener('click', () => loadNetwork(dataFiles.family));
-document.getElementById('julioIglesias').addEventListener('click', () => loadNetwork(dataFiles.julioIglesias));
 
 // Animation loop
 function animate() {
