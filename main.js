@@ -87,10 +87,12 @@ function clearNetwork() {
 }
 
 async function loadNetwork(filename) {
+    console.log("Loading network:", filename);
     clearNetwork();
 
     // Lade und erstelle neue Knoten mit verschiedenen Formen
     const nodePositions = await createNodes(filename);
+    console.log("Nodes loaded:", nodePositions);
     currentNodes = nodePositions.map(pos => {
         const node = new Node(pos, {
             type: 'cube',
@@ -144,6 +146,8 @@ document.getElementById('largeData').addEventListener('click', () => loadNetwork
 document.getElementById('megaData').addEventListener('click', () => loadNetwork(dataFiles.mega));
 document.getElementById('miniData').addEventListener('click', () => loadNetwork(dataFiles.mini));
 document.getElementById('familyData').addEventListener('click', () => loadNetwork(dataFiles.family));
+document.getElementById('julioIglesias').addEventListener('click', () => loadNetwork(dataFiles.julioIglesias));
+document.getElementById('architektur').addEventListener('click', () => loadNetwork(dataFiles.architektur));
 
 // Animation loop
 function animate() {

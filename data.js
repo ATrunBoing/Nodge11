@@ -84,5 +84,6 @@ export const dataFiles = {
     mega: 'data/mega.json',
     mini: 'data/mini.json',
 	family: 'family.json',
-	julioIglesias: 'julioIglesias.json'
+	julioIglesias: 'julioIglesias.json',
+	architektur: 'architektur.json'
 };
