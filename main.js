@@ -120,6 +120,27 @@ async function loadNetwork(filename) {
             return edge;
         });
     }
+
+    let xAxis = "unbekannt";
+    let yAxis = "unbekannt";
+    let zAxis = "unbekannt";
+
+    if (filename === "architektur.json") {
+        xAxis = "Fortschreitender Ladevorgang";
+        yAxis = "Art der Komponente";
+        zAxis = "Tiefe";
+    }
+
+    updateFileInfoPanel(filename, nodePositions.length, edgeDefinitions ? edgeDefinitions.length : 0, xAxis, yAxis, zAxis);
+}
+
+function updateFileInfoPanel(filename, nodeCount, edgeCount, xAxis, yAxis, zAxis) {
+    document.getElementById('fileFilename').textContent = `Dateiname: ${filename}`;
+    document.getElementById('fileNodeCount').textContent = `Anzahl Knoten: ${nodeCount}`;
+    document.getElementById('fileEdgeCount').textContent = `Anzahl Kanten: ${edgeCount}`;
+    document.getElementById('fileXAxis').textContent = `X-Achse: ${xAxis}`;
+    document.getElementById('fileYAxis').textContent = `Y-Achse: ${yAxis}`;
+    document.getElementById('fileZAxis').textContent = `Z-Achse: ${zAxis}`;
 }
 
 // Initialisiere Manager
