@@ -90,48 +90,136 @@ async function loadNetwork(filename) {
     console.log("Loading network:", filename);
     clearNetwork();
 
-    // Lade und erstelle neue Knoten mit verschiedenen Formen
-    const nodePositions = await createNodes(filename);
-    console.log("Nodes loaded:", nodePositions);
-    currentNodes = nodePositions.map(pos => {
-        const node = new Node(pos, {
-            type: 'cube',
-            size: 1.2,
-            color: 0xff4500
-        });
-        node.mesh.name = pos.name;
-        scene.add(node.mesh);
-        return node;
-    });
+    try {
+        // Lade die Netzwerkdaten
+        const data = await loadNetworkData(filename);
+        if (!data) {
+            console.error("Fehler beim Laden der Daten:", filename);
+            return;
+        }
 
-    // Lade und erstelle neue Kanten mit verschiedenen Stilen
-    const edgeDefinitions = await createEdgeDefinitions(filename, currentNodes);
-    if (edgeDefinitions) {
-        currentEdges = edgeDefinitions.map((def) => {
-            const edge = new Edge(def.start, def.end, {
-                style: ['solid', 'dashed', 'dotted'][Math.floor(Math.random() * 3)],
-                color: [0x0000ff, 0x00ff00, 0xff0000][Math.floor(Math.random() * 3)],
-                width: 3,
-                curveHeight: def.offset + 2,
-                offset: def.offset,
+        // Lade und erstelle neue Knoten mit verschiedenen Formen
+        const nodePositions = await createNodes(filename);
+        console.log("Nodes loaded:", nodePositions.length);
+        
+        // Erstelle Knoten mit verschiedenen Formen basierend auf Metadaten
+        currentNodes = nodePositions.map((pos, index) => {
+            // Bestimme Knotentyp basierend auf Metadaten oder Index
+            let nodeType = 'cube';
+            let nodeSize = 1.2;
+            let nodeColor = 0xff4500;
+            
+            // Verwende Metadaten, falls vorhanden
+            if (pos.metadata) {
+                if (pos.metadata.type) {
+                    nodeType = pos.metadata.type;
+                }
+                if (pos.metadata.size) {
+                    nodeSize = pos.metadata.size;
+                }
+                if (pos.metadata.color) {
+                    nodeColor = pos.metadata.color;
+                }
+            }
+            
+            // Variiere die Form basierend auf dem Index für visuelle Unterscheidung
+            const nodeTypes = ['cube', 'icosahedron', 'dodecahedron', 'octahedron', 'tetrahedron'];
+            if (!pos.metadata || !pos.metadata.type) {
+                nodeType = nodeTypes[index % nodeTypes.length];
+            }
+            
+            // Erstelle den Knoten
+            const node = new Node(pos, {
+                type: nodeType,
+                size: nodeSize,
+                color: nodeColor
             });
-            edge.line.name = def.name;
-            scene.add(edge.line);
-            return edge;
+            
+            // Füge den Knoten zur Szene hinzu
+            scene.add(node.mesh);
+            return node;
         });
+
+        // Lade und erstelle neue Kanten mit verschiedenen Stilen
+        const edgeDefinitions = await createEdgeDefinitions(filename, nodePositions);
+        if (edgeDefinitions && edgeDefinitions.length > 0) {
+            console.log("Edges loaded:", edgeDefinitions.length);
+            
+            currentEdges = edgeDefinitions.map((def, index) => {
+                // Finde die entsprechenden Node-Objekte für Start und Ende
+                const startNodeObj = currentNodes.find(n => n.position === def.start);
+                const endNodeObj = currentNodes.find(n => n.position === def.end);
+                
+                if (!startNodeObj || !endNodeObj) {
+                    console.warn("Konnte Start- oder Endknoten nicht finden:", def);
+                    return null;
+                }
+                
+                // Bestimme Kantentyp basierend auf Metadaten oder Index
+                let edgeStyle = ['solid', 'dashed', 'dotted'][index % 3];
+                let edgeColor = [0x0000ff, 0x00ff00, 0xff0000][index % 3];
+                
+                // Verwende Typ aus der Definition, falls vorhanden
+                if (def.name && def.name.includes('parent')) {
+                    edgeStyle = 'solid';
+                    edgeColor = 0xff0000; // Rot für Eltern-Kind-Beziehungen
+                } else if (def.name && def.name.includes('spouse')) {
+                    edgeStyle = 'dashed';
+                    edgeColor = 0x00ff00; // Grün für Ehepartner-Beziehungen
+                }
+                
+                // Erstelle die Kante
+                const edge = new Edge(startNodeObj, endNodeObj, {
+                    style: edgeStyle,
+                    color: edgeColor,
+                    width: 3,
+                    curveHeight: def.offset + 2,
+                    offset: def.offset,
+                    name: def.name
+                });
+                
+                // Füge die Kante zur Szene hinzu
+                scene.add(edge.line);
+                return edge;
+            }).filter(edge => edge !== null); // Filtere null-Werte heraus
+        } else {
+            console.log("Keine Kanten geladen");
+            currentEdges = [];
+        }
+
+        // Bestimme Achsenbeschreibungen basierend auf der Datei
+        let xAxis = "unbekannt";
+        let yAxis = "unbekannt";
+        let zAxis = "unbekannt";
+
+        // Spezifische Achsenbeschreibungen für bestimmte Dateien
+        if (filename === "architektur.json") {
+            xAxis = "Fortschreitender Ladevorgang";
+            yAxis = "Art der Komponente";
+            zAxis = "Tiefe";
+        } else if (filename.includes("family") || filename.includes("Iglesias")) {
+            xAxis = "Horizontale Position";
+            yAxis = "Generation";
+            zAxis = "Tiefe";
+        }
+
+        // Aktualisiere das Dateiinfo-Panel
+        updateFileInfoPanel(
+            filename, 
+            nodePositions.length, 
+            edgeDefinitions ? edgeDefinitions.length : 0, 
+            xAxis, 
+            yAxis, 
+            zAxis
+        );
+        
+        console.log("Netzwerk erfolgreich geladen:", filename);
+        
+    } catch (error) {
+        console.error("Fehler beim Laden des Netzwerks:", error);
+        // Zeige Fehlermeldung im Dateiinfo-Panel
+        updateFileInfoPanel(filename, 0, 0, "Fehler", "Fehler", "Fehler");
     }
-
-    let xAxis = "unbekannt";
-    let yAxis = "unbekannt";
-    let zAxis = "unbekannt";
-
-    if (filename === "architektur.json") {
-        xAxis = "Fortschreitender Ladevorgang";
-        yAxis = "Art der Komponente";
-        zAxis = "Tiefe";
-    }
-
-    updateFileInfoPanel(filename, nodePositions.length, edgeDefinitions ? edgeDefinitions.length : 0, xAxis, yAxis, zAxis);
 }
 
 function updateFileInfoPanel(filename, nodeCount, edgeCount, xAxis, yAxis, zAxis) {

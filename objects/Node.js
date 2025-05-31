@@ -14,7 +14,27 @@ export class Node {
         
         this.mesh = this.createMesh();
         this.mesh.userData.type = 'node';        // Für spätere Identifikation
+        this.mesh.userData.node = this;          // Referenz auf das Node-Objekt
         this.mesh.glow = null;
+        
+        // Übertrage wichtige Eigenschaften vom position-Objekt auf das Mesh
+        if (position) {
+            // Übertrage den Namen
+            this.mesh.name = position.name || 'Unbenannter Knoten';
+            
+            // Übertrage die ID
+            this.mesh.id = position.id !== undefined ? position.id : this.mesh.id;
+            
+            // Übertrage Metadaten
+            this.mesh.metadata = position.metadata || {};
+            
+            // Wenn position selbst Metadaten hat, füge diese hinzu
+            if (position.metadata === undefined) {
+                // Extrahiere alle Eigenschaften außer position und name als Metadaten
+                const { x, y, z, position: pos, ...otherProps } = position;
+                this.mesh.metadata = { ...otherProps };
+            }
+        }
     }
 
     createMesh() {
@@ -27,7 +47,16 @@ export class Node {
         });
         
         const mesh = new THREE.Mesh(geometry, material);
-        mesh.position.copy(this.position);
+        
+        // Kopiere die Position
+        if (this.position && this.position.x !== undefined) {
+            mesh.position.set(
+                this.position.x,
+                this.position.y,
+                this.position.z
+            );
+        }
+        
         mesh.castShadow = true;
         mesh.receiveShadow = true;
         

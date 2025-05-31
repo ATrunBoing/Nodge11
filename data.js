@@ -29,48 +29,87 @@ export const createNodes = async (filename) => {
         return [];
     }
 
-    allNodes = nodes.map(node => { // Speichere die Knoten in allNodes
+    allNodes = nodes.map((node, index) => { // Speichere die Knoten in allNodes
+        // Position extrahieren
         let x, y, z;
         if (node.position) {
             x = node.position.x;
             y = node.position.y;
             z = node.position.z;
         } else {
-            x = node.x;
-            y = node.y;
-            z = node.z;
+            x = node.x || 0;
+            y = node.y || 0;
+            z = node.z || 0;
         }
+        
+        // Erstelle Vector3 für die Position
         const vector = new THREE.Vector3(x, y, z);
-        vector.name = node.name || '';
+        
+        // Füge wichtige Eigenschaften hinzu
+        vector.name = node.name || `Node ${index}`;
+        vector.id = node.id || index;
+        
+        // Füge alle anderen Eigenschaften des Knotens als Metadaten hinzu
+        vector.metadata = { ...node };
+        
+        // Stelle sicher, dass die Position-Eigenschaft existiert (für Konsistenz)
+        vector.position = vector;
+        
         return vector;
     });
+    
+    console.log(`Loaded ${allNodes.length} nodes from ${filename}`);
     return allNodes;
 };
 
 // Erstelle Kantendefinitionen aus JSON-Daten
 export const createEdgeDefinitions = async (filename, nodes) => {
     const data = await loadNetworkData(filename);
-    if (!data) return [];
+    if (!data || !data.edges) return [];
+    
+    // Erstelle eine Map für schnellen Zugriff auf Knoten nach ID oder Index
+    const nodeMap = new Map();
+    
+    // Fülle die Map mit Knoten
+    nodes.forEach((node, index) => {
+        // Speichere Knoten nach Index
+        nodeMap.set(index, node);
+        
+        // Wenn der Knoten eine ID hat, speichere ihn auch nach ID
+        if (node.id) {
+            nodeMap.set(node.id, node);
+        }
+        
+        // Speichere auch nach Namen, falls vorhanden
+        if (node.name) {
+            nodeMap.set(node.name, node);
+        }
+    });
+    
     return data.edges.map(edge => {
-		let start = nodes[edge.start];
-		let end = nodes[edge.end];
-
+        // Bestimme Start- und Endknoten basierend auf verschiedenen möglichen Eigenschaften
+        let startId = edge.start !== undefined ? edge.start : edge.source;
+        let endId = edge.end !== undefined ? edge.end : edge.target;
+        
+        let start = nodeMap.get(startId);
+        let end = nodeMap.get(endId);
+        
         if (!start || !end) {
-            console.warn(`Ungültiger Knotenindex in Kantendefinition: start=${edge.start}, end=${edge.end}, Knotenanzahl=${nodes.length}`);
+            console.warn(`Ungültiger Knotenindex in Kantendefinition: start=${startId}, end=${endId}`);
             return null; // Überspringe diese Kante
         }
-
+        
         const startNode = start;
         const endNode = end;
         const distance = startNode.position.distanceTo(endNode.position);
         const maxOffset = distance / 3;
-        const offset = Math.min(edge.offset, maxOffset);
-
+        const offset = Math.min(edge.offset || 0, maxOffset);
+        
         const edgeDefinition = {
             start: startNode,
             end: endNode,
             offset: offset,
-            name: edge.type
+            name: edge.type || edge.name || `Edge ${startId}-${endId}`
         };
         return edgeDefinition;
     }).filter(edge => edge !== null); // Filtere übersprungene Kanten heraus

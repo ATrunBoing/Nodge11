@@ -1,4 +1,4 @@
-  import * as THREE from 'three';
+import * as THREE from 'three';
 
 export class Edge {
     constructor(startNode, endNode, options = {}) {
@@ -8,17 +8,26 @@ export class Edge {
             color: options.color || 0x0000ff,
             style: options.style || 'solid',
             curveHeight: options.curveHeight || 2,
-			offset: options.offset || 0,
+            offset: options.offset || 0,
             segments: options.segments || 50,
             dashSize: options.dashSize || 0.5,
             gapSize: 0.3,
             ...options
         };
 
+        // Speichere den Namen der Kante
+        this.name = options.name || `Edge ${startNode?.name || 'start'}-${endNode?.name || 'end'}`;
+        
+        // Erstelle die Linie
         this.line = this.createLine();
         this.line.userData.type = 'edge';
         this.line.userData.edge = this;
+        this.line.name = this.name;
         this.line.glow = null;
+        
+        // Speichere Metadaten
+        this.metadata = { ...options };
+        this.line.metadata = this.metadata;
     }
 
     createLine() {
