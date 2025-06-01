@@ -22,8 +22,8 @@ export class Node {
             // Übertrage den Namen
             this.mesh.name = position.name || 'Unbenannter Knoten';
             
-            // Übertrage die ID
-            this.mesh.id = position.id !== undefined ? position.id : this.mesh.id;
+            // Übertrage die ID auf das Node-Objekt
+            this.id = position.id;
             
             // Übertrage Metadaten
             this.mesh.metadata = position.metadata || {};

@@ -63,6 +63,15 @@
             display: none;
             cursor: pointer;
             z-index: 100;
+            transition: width 0.3s ease, height 0.3s ease, background-color 0.3s ease; /* Übergang für sanfte Animation */
+            overflow: hidden; /* Inhalt verstecken, wenn Panel klein ist */
+        }
+
+        #infoPanel.expanded {
+            width: 300px; /* Beispielbreite, kann angepasst werden */
+            height: auto; /* Höhe an Inhalt anpassen */
+            background-color: rgba(255, 255, 255, 0.95); /* Weniger transparent, wenn erweitert */
+            cursor: default; /* Standard-Cursor, wenn erweitert */
         }
 
         #infoPanel h3 {
@@ -73,6 +82,10 @@
         #infoPanelContent {
             display: none;
             margin-top: 5px;
+        }
+
+        #infoPanel.expanded #infoPanelContent {
+            display: block; /* Inhalt anzeigen, wenn Panel erweitert ist */
         }
 		
     </style>
