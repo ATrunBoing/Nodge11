@@ -14,7 +14,9 @@ Für das Erstellen einer .json Datei für Nodges gelten folgende Regeln für all
 
 Für das Erstellen einer .json des typus family:
 - Die Nodes werden wie bei einem klassischen Familienstammbaum angeordnet. Sie befinden sich in der gleichen x/y Ebene. 
-Die angeheirateten Partner sind in der z-Achse versetzt.
-- Männer werden als Box dargestellt. Frauen als Dodecahedron. Nonbinäre als Icosahedron.
-- Die Verbindungen zwischen den Familienmitgliedern entsprechen einer direkten Blutlinie.
-- die panel sind für alle nodes angezeigt.
+Die angeheirateten Partner sind in der z-Achse nach hinten versetzt.
+- Männer werden als rote Box dargestellt. Frauen als blaues Dodecahedron. Nonbinäre als weisse Icosahedron.
+- Die grünen erbindungen zwischen den Familienmitgliedern entsprechen einer direkten Blutlinie.
+- orange verbindeungen sind angeheiratet.
+ - die panel sind für alle nodes angezeigt.
+- wähle eine gleichmässige symetrische anordnung über 0,0,0
