@@ -122,5 +122,6 @@ export const dataFiles = {
     large: 'data/examples/large.json',
     mega: 'data/examples/mega.json',
     family: 'data/examples/family.json',
-    architektur: 'data/examples/architektur.json'
+    architektur: 'data/examples/architektur.json',
+    royalFamily: 'data/examples/royal_family.json'
 };

@@ -255,6 +255,7 @@ document.getElementById('largeData').addEventListener('click', () => loadNetwork
 document.getElementById('megaData').addEventListener('click', () => loadNetwork(dataFiles.mega));
 document.getElementById('familyData').addEventListener('click', () => loadNetwork(dataFiles.family));
 document.getElementById('architektur').addEventListener('click', () => loadNetwork(dataFiles.architektur));
+document.getElementById('royalFamilyData').addEventListener('click', () => loadNetwork(dataFiles.royalFamily));
 
 // Animation loop
 function animate() {
