@@ -253,9 +253,7 @@ document.getElementById('smallData').addEventListener('click', () => loadNetwork
 document.getElementById('mediumData').addEventListener('click', () => loadNetwork(dataFiles.medium));
 document.getElementById('largeData').addEventListener('click', () => loadNetwork(dataFiles.large));
 document.getElementById('megaData').addEventListener('click', () => loadNetwork(dataFiles.mega));
-document.getElementById('miniData').addEventListener('click', () => loadNetwork(dataFiles.mini));
 document.getElementById('familyData').addEventListener('click', () => loadNetwork(dataFiles.family));
-document.getElementById('julioIglesias').addEventListener('click', () => loadNetwork(dataFiles.julioIglesias));
 document.getElementById('architektur').addEventListener('click', () => loadNetwork(dataFiles.architektur));
 
 // Animation loop

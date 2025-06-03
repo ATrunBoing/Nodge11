@@ -121,8 +121,6 @@ export const dataFiles = {
     medium: 'data/examples/medium.json',
     large: 'data/examples/large.json',
     mega: 'data/examples/mega.json',
-    mini: 'data/mini.json', // Assuming mini.json is not in examples, based on previous context
-	family: 'data/examples/family.json',
-	julioIglesias: 'data/examples/julioIglesias.json', // Assuming this will be moved to examples
-	architektur: 'architektur.json' // Assuming this is not in examples
+    family: 'data/examples/family.json',
+    architektur: 'data/examples/architektur.json'
 };
