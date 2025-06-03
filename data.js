@@ -117,12 +117,12 @@ export const createEdgeDefinitions = async (filename, nodes) => {
 
 // Exportiere die Dateinamen für einfachen Zugriff
 export const dataFiles = {
-    small: 'data/small.json',
-    medium: 'data/medium.json',
-    large: 'data/large.json',
-    mega: 'data/mega.json',
-    mini: 'data/mini.json',
-	family: 'family.json',
-	julioIglesias: 'julioIglesias.json',
-	architektur: 'architektur.json'
+    small: 'data/examples/small.json',
+    medium: 'data/examples/medium.json',
+    large: 'data/examples/large.json',
+    mega: 'data/examples/mega.json',
+    mini: 'data/mini.json', // Assuming mini.json is not in examples, based on previous context
+	family: 'data/examples/family.json',
+	julioIglesias: 'data/examples/julioIglesias.json', // Assuming this will be moved to examples
+	architektur: 'architektur.json' // Assuming this is not in examples
 };
