@@ -69,6 +69,8 @@ scene.add(directionalLight);
 // Netzwerk-Verwaltung
 let currentNodes = [];
 let currentEdges = [];
+let currentFilename = '';
+let useIcons = false; // Zustand für Icons oder platonische Körper
 
 function clearNetwork() {
     currentNodes.forEach(node => {
@@ -88,6 +90,7 @@ function clearNetwork() {
 
 async function loadNetwork(filename) {
     console.log("Loading network:", filename);
+    currentFilename = filename; // Speichere den aktuellen Dateinamen
     clearNetwork();
 
     try {
@@ -104,7 +107,6 @@ async function loadNetwork(filename) {
         
         // Erstelle Knoten mit verschiedenen Formen basierend auf Metadaten
         currentNodes = nodePositions.map((pos, index) => {
-            // Bestimme Knotentyp basierend auf Metadaten oder Index
             let nodeType = 'cube';
             let nodeSize = 1.2;
             let nodeColor = 0xff4500;
@@ -120,12 +122,39 @@ async function loadNetwork(filename) {
                 if (pos.metadata.color) {
                     nodeColor = pos.metadata.color;
                 }
-            }
-            
-            // Variiere die Form basierend auf dem Index für visuelle Unterscheidung
-            const nodeTypes = ['cube', 'icosahedron', 'dodecahedron', 'octahedron', 'tetrahedron'];
-            if (!pos.metadata || !pos.metadata.type) {
-                nodeType = nodeTypes[index % nodeTypes.length];
+
+                // Logik für Icons basierend auf Geschlecht und Generation
+                if (useIcons && data.metadata.type === "family") {
+                    if (pos.metadata.gender === "male") {
+                        nodeType = 'male_icon';
+                        nodeColor = 0xff0000; // Rot für Männer
+                    } else if (pos.metadata.gender === "female") {
+                        nodeType = 'female_icon';
+                        nodeColor = 0x0000ff; // Blau für Frauen
+                    } else if (pos.metadata.gender === "nonbinary") {
+                        nodeType = 'diverse_icon';
+                        nodeColor = 0xffffff; // Weiß für Nonbinäre
+                    }
+
+                    // Kinder-Icons kleiner machen (angenommen Y-Koordinate < 5 ist Kind)
+                    if (pos.position.y < 5) { 
+                        nodeSize = 0.8; 
+                    } else {
+                        nodeSize = 1.2;
+                    }
+                } else if (data.metadata.type === "family") {
+                    // Standard platonische Körper für Familienstammbaum
+                    if (pos.metadata.gender === "male") {
+                        nodeType = 'cube';
+                        nodeColor = 0xff0000;
+                    } else if (pos.metadata.gender === "female") {
+                        nodeType = 'dodecahedron';
+                        nodeColor = 0x0000ff;
+                    } else if (pos.metadata.gender === "nonbinary") {
+                        nodeType = 'icosahedron';
+                        nodeColor = 0xffffff;
+                    }
+                }
             }
             
             // Erstelle den Knoten
@@ -160,12 +189,12 @@ async function loadNetwork(filename) {
                 let edgeColor = [0x0000ff, 0x00ff00, 0xff0000][index % 3];
                 
                 // Verwende Typ aus der Definition, falls vorhanden
-                if (def.name && def.name.includes('parent')) {
+                if (def.name && def.name.includes('bloodline')) {
                     edgeStyle = 'solid';
-                    edgeColor = 0xff0000; // Rot für Eltern-Kind-Beziehungen
-                } else if (def.name && def.name.includes('spouse')) {
+                    edgeColor = 0x00ff00; // Grün für Blutsverwandtschaft
+                } else if (def.name && def.name.includes('marriage')) {
                     edgeStyle = 'dashed';
-                    edgeColor = 0x00ff00; // Grün für Ehepartner-Beziehungen
+                    edgeColor = 0xffa500; // Orange für Ehepartner-Beziehungen
                 }
                 
                 // Erstelle die Kante
@@ -256,6 +285,13 @@ document.getElementById('megaData').addEventListener('click', () => loadNetwork(
 document.getElementById('familyData').addEventListener('click', () => loadNetwork(dataFiles.family));
 document.getElementById('architektur').addEventListener('click', () => loadNetwork(dataFiles.architektur));
 document.getElementById('royalFamilyData').addEventListener('click', () => loadNetwork(dataFiles.royalFamily));
+
+document.getElementById('toggleIcons').addEventListener('click', () => {
+    useIcons = !useIcons; // Zustand umschalten
+    if (currentFilename) {
+        loadNetwork(currentFilename); // Netzwerk mit neuem Zustand neu laden
+    }
+});
 
 // Animation loop
 function animate() {

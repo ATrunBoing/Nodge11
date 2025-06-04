@@ -4,7 +4,7 @@ export class Node {
     constructor(position, options = {}) {
         this.position = position;
         this.options = {
-            type: options.type || 'cube',        // cube, icosahedron, dodecahedron, octahedron, tetrahedron
+            type: options.type || 'cube',        // cube, icosahedron, dodecahedron, octahedron, tetrahedron, male_icon, female_icon, diverse_icon
             size: options.size || 1,             // Grundgröße
             color: options.color || 0xff4500,    // Farbe
             glowFrequency: options.glowFrequency || 4, // Pulsgeschwindigkeit (0.25-5 Hz)
@@ -65,8 +65,54 @@ export class Node {
 
     createGeometry() {
         const size = this.options.size;
+        const depth = size / 4; // Dicke des 2D-Icons
+
+        const extrudeSettings = {
+            steps: 1,
+            depth: depth,
+            bevelEnabled: false
+        };
         
         switch(this.options.type.toLowerCase()) {
+            case 'male_icon':
+                {
+                    const shape = new THREE.Shape();
+                    // Body (rectangle)
+                    shape.moveTo(-size / 4, -size / 2);
+                    shape.lineTo(size / 4, -size / 2);
+                    shape.lineTo(size / 4, size / 4);
+                    shape.lineTo(-size / 4, size / 4);
+                    shape.lineTo(-size / 4, -size / 2);
+
+                    // Head (circle)
+                    const headRadius = size / 4;
+                    shape.absarc(0, size / 4 + headRadius, headRadius, 0, Math.PI * 2, false);
+
+                    return new THREE.ExtrudeGeometry(shape, extrudeSettings);
+                }
+            case 'female_icon':
+                {
+                    const shape = new THREE.Shape();
+                    // Body (rectangle, similar to male icon)
+                    shape.moveTo(-size / 4, -size / 2);
+                    shape.lineTo(size / 4, -size / 2);
+                    shape.lineTo(size / 4, size / 4);
+                    shape.lineTo(-size / 4, size / 4);
+                    shape.lineTo(-size / 4, -size / 2);
+
+                    // Head (circle)
+                    const headRadius = size / 4;
+                    shape.absarc(0, size / 4 + headRadius, headRadius, 0, Math.PI * 2, false);
+
+                    return new THREE.ExtrudeGeometry(shape, extrudeSettings);
+                }
+            case 'diverse_icon':
+                {
+                    const shape = new THREE.Shape();
+                    shape.absarc(0, 0, size / 2, 0, Math.PI * 2, false); // Simple circle
+
+                    return new THREE.ExtrudeGeometry(shape, extrudeSettings);
+                }
             case 'icosahedron':
                 return new THREE.IcosahedronGeometry(size/2);
                 
@@ -85,12 +131,11 @@ export class Node {
         }
     }
 
-    // Hilfsmethode zum Aktualisieren der Farbe
+    // Hilfsmethoden zum Aktualisieren der Eigenschaften
     setColor(color) {
         this.mesh.material.color.setHex(color);
     }
 
-    // Hilfsmethode zum Aktualisieren der Größe
     setSize(size) {
         this.options.size = size;
         const newGeometry = this.createGeometry();
@@ -98,7 +143,6 @@ export class Node {
         this.mesh.geometry = newGeometry;
     }
 
-    // Hilfsmethode zum Ändern der Form
     setType(type) {
         this.options.type = type;
         const newGeometry = this.createGeometry();
