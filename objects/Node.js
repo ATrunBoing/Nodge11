@@ -1,6 +1,10 @@
 import * as THREE from 'three';
 
 export class Node {
+    // Statische Caches für Geometrien und Materialien
+    static geometryCache = new Map();
+    static materialCache = new Map();
+
     constructor(position, options = {}) {
         this.position = position;
         this.options = {
@@ -39,12 +43,19 @@ export class Node {
 
     createMesh() {
         const geometry = this.createGeometry();
-        const material = new THREE.MeshPhongMaterial({ 
-            color: this.options.color,
-            shininess: 30,
-            emissive: new THREE.Color(0x000000),
-            emissiveIntensity: 0
-        });
+        const color = this.options.color;
+        const cacheKey = `material-${color}`;
+
+        let material = Node.materialCache.get(cacheKey);
+        if (!material) {
+            material = new THREE.MeshPhongMaterial({ 
+                color: color,
+                shininess: 30,
+                emissive: new THREE.Color(0x000000),
+                emissiveIntensity: 0
+            });
+            Node.materialCache.set(cacheKey, material);
+        }
         
         const mesh = new THREE.Mesh(geometry, material);
         
@@ -65,15 +76,23 @@ export class Node {
 
     createGeometry() {
         const size = this.options.size;
-        const depth = size / 4; // Dicke des 2D-Icons
+        const type = this.options.type.toLowerCase();
+        const cacheKey = `${type}-${size}`;
 
+        if (Node.geometryCache.has(cacheKey)) {
+            return Node.geometryCache.get(cacheKey);
+        }
+
+        const depth = size / 4; // Dicke des 2D-Icons
         const extrudeSettings = {
             steps: 1,
             depth: depth,
             bevelEnabled: false
         };
         
-        switch(this.options.type.toLowerCase()) {
+        let geometry;
+
+        switch(type) {
             case 'male_icon':
                 {
                     const shape = new THREE.Shape();
@@ -88,8 +107,9 @@ export class Node {
                     const headRadius = size / 4;
                     shape.absarc(0, size / 4 + headRadius, headRadius, 0, Math.PI * 2, false);
 
-                    return new THREE.ExtrudeGeometry(shape, extrudeSettings);
+                    geometry = new THREE.ExtrudeGeometry(shape, extrudeSettings);
                 }
+                break;
             case 'female_icon':
                 {
                     const shape = new THREE.Shape();
@@ -104,31 +124,36 @@ export class Node {
                     const headRadius = size / 4;
                     shape.absarc(0, size / 4 + headRadius, headRadius, 0, Math.PI * 2, false);
 
-                    return new THREE.ExtrudeGeometry(shape, extrudeSettings);
+                    geometry = new THREE.ExtrudeGeometry(shape, extrudeSettings);
                 }
+                break;
             case 'diverse_icon':
                 {
                     const shape = new THREE.Shape();
                     shape.absarc(0, 0, size / 2, 0, Math.PI * 2, false); // Simple circle
 
-                    return new THREE.ExtrudeGeometry(shape, extrudeSettings);
+                    geometry = new THREE.ExtrudeGeometry(shape, extrudeSettings);
                 }
+                break;
             case 'icosahedron':
-                return new THREE.IcosahedronGeometry(size/2);
-                
+                geometry = new THREE.IcosahedronGeometry(size/2);
+                break;
             case 'dodecahedron':
-                return new THREE.DodecahedronGeometry(size/2);
-                
+                geometry = new THREE.DodecahedronGeometry(size/2);
+                break;
             case 'octahedron':
-                return new THREE.OctahedronGeometry(size/2);
-                
+                geometry = new THREE.OctahedronGeometry(size/2);
+                break;
             case 'tetrahedron':
-                return new THREE.TetrahedronGeometry(size/2);
-                
+                geometry = new THREE.TetrahedronGeometry(size/2);
+                break;
             case 'cube':
             default:
-                return new THREE.BoxGeometry(size, size, size);
+                geometry = new THREE.BoxGeometry(size, size, size);
+                break;
         }
+        Node.geometryCache.set(cacheKey, geometry);
+        return geometry;
     }
 
     // Hilfsmethoden zum Aktualisieren der Eigenschaften

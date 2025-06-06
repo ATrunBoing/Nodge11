@@ -1,6 +1,10 @@
 import * as THREE from 'three';
 
 export class Edge {
+    // Statische Caches für Geometrien und Materialien
+    static geometryCache = new Map();
+    static materialCache = new Map();
+
     constructor(startNode, endNode, options = {}) {
         this.startNode = startNode;
         this.endNode = endNode;
@@ -66,18 +70,35 @@ export class Edge {
     }
 
     createGeometry(curve) {
-        const points = curve.getPoints(this.options.segments);
-        const geometry = new THREE.TubeGeometry(curve, this.options.segments, 0.1, 3, false);
+        const segments = this.options.segments;
+        const curveHeight = this.options.curveHeight;
+        const offset = this.options.offset;
+        const cacheKey = `curve-${curve.uuid}-${segments}-${curveHeight}-${offset}`; // Einzigartiger Schlüssel für die Kurve
+
+        if (Edge.geometryCache.has(cacheKey)) {
+            return Edge.geometryCache.get(cacheKey);
+        }
+
+        const geometry = new THREE.TubeGeometry(curve, segments, 0.1, 3, false);
+        Edge.geometryCache.set(cacheKey, geometry);
         return geometry;
     }
 
     createMaterial() {
+        const color = this.options.color;
+        const style = this.options.style;
+        const cacheKey = `material-${color}-${style}`;
+
+        if (Edge.materialCache.has(cacheKey)) {
+            return Edge.materialCache.get(cacheKey);
+        }
+
         let material;
 
-        switch(this.options.style) {
+        switch(style) {
             case 'dashed':
                 material = new THREE.MeshPhongMaterial({
-                    color: this.options.color,
+                    color: color,
                     transparent: true,
                     opacity: 0.5,
 					side: THREE.DoubleSide,
@@ -86,7 +107,7 @@ export class Edge {
                 break;
             case 'dotted':
                 material = new THREE.MeshPhongMaterial({
-                    color: this.options.color,
+                    color: color,
                     transparent: true,
                     opacity: 0.5,
 					side: THREE.DoubleSide,
@@ -95,12 +116,13 @@ export class Edge {
                 break;
             default:
                 material = new THREE.MeshPhongMaterial({
-                    color: this.options.color,
+                    color: color,
 					side: THREE.DoubleSide,
 					shininess: 30
                 });
                 break;
         }
+        Edge.materialCache.set(cacheKey, material);
 		return material;
     }
 

@@ -111,20 +111,15 @@ async function loadNetwork(filename) {
             let nodeSize = 1.2;
             let nodeColor = 0xff4500;
             
-            // Verwende Metadaten, falls vorhanden
+            // Verwende Metadaten, falls vorhanden, oder Standardwerte
             if (pos.metadata) {
-                if (pos.metadata.type) {
-                    nodeType = pos.metadata.type;
-                }
-                if (pos.metadata.size) {
-                    nodeSize = pos.metadata.size;
-                }
-                if (pos.metadata.color) {
-                    nodeColor = pos.metadata.color;
-                }
+                nodeType = pos.metadata.type || nodeType;
+                nodeSize = pos.metadata.size || nodeSize;
+                nodeColor = pos.metadata.color || nodeColor;
 
                 // Logik für Icons basierend auf Geschlecht und Generation
-                if (useIcons && data.metadata.type === "family") {
+                // Überprüfe, ob data.metadata existiert, bevor auf .type zugegriffen wird
+                if (useIcons && data.metadata && data.metadata.type === "family") {
                     if (pos.metadata.gender === "male") {
                         nodeType = 'male_icon';
                         nodeColor = 0xff0000; // Rot für Männer
@@ -142,7 +137,7 @@ async function loadNetwork(filename) {
                     } else {
                         nodeSize = 1.2;
                     }
-                } else if (data.metadata.type === "family") {
+                } else if (data.metadata && data.metadata.type === "family") {
                     // Standard platonische Körper für Familienstammbaum
                     if (pos.metadata.gender === "male") {
                         nodeType = 'cube';
